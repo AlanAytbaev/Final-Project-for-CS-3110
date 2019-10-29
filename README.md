@@ -2,7 +2,15 @@
 The final project for 3110.
 
 GitHub Instructions:
-  Before starting work, pull the latest code using
+  Before starting work, make sure that you are on the [Dev] branch!!!
+ 
+    [git checkout Dev]
+    
+  To make sure that you are on the Dev branch, type this command and see if Dev is highlighted:
+  
+    [git branch]
+
+  Before starting work, pull the latest code using:
  
     [git pull origin Dev]
     
