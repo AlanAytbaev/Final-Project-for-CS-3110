@@ -8,6 +8,10 @@ GitHub Instructions:
     
   This pulls data from the [Dev] branch to the [origin] in your computer
   
+  Then add the file youve changed:
+ 
+    [git add file]
+  
   After you've worked on your code, make sure that no one else has worked on the same files that you have, to avoid merge
   conflicts. I will sort these out if they occur. Text immediately if merge conflicts occur.
   
