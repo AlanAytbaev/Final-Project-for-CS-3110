@@ -1,17 +1,10 @@
 ### Starting build.
-# Target: main.ml.depends, tags: { extension:ml, file:main.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules main.ml > main.ml.depends # cached
-# Target: ast.ml.depends, tags: { extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules ast.ml > ast.ml.depends # cached
-# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
-/Users/emilyweed/.opam/4.08.1/bin/ocamllex.opt -q lexer.mll # cached
-# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules lexer.ml > lexer.ml.depends # cached
-# Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
-/Users/emilyweed/.opam/4.08.1/bin/ocamlyacc parser.mly
-+ /Users/emilyweed/.opam/4.08.1/bin/ocamlyacc parser.mly
-File "parser.mly", line 22: unterminated action
-|e = expr; EOF { e }
-   ^
-Command exited with code 1.
+# Target: arithmetic.ml.depends, tags: { extension:ml, file:arithmetic.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -modules arithmetic.ml > arithmetic.ml.depends
+# Target: arithmetic.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:arithmetic.cmo, file:arithmetic.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -o arithmetic.cmo arithmetic.ml
++ ocamlfind ocamlc -c -o arithmetic.cmo arithmetic.ml
+File "arithmetic.ml", line 2, characters 30-46:
+Error: Unbound module type Arithmetic_Funcs
+Command exited with code 2.
 # Compilation unsuccessful.
