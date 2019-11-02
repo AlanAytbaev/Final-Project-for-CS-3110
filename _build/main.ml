@@ -1,6 +1,7 @@
 open Ast
 open Stdlib
 open ANSITerminal
+open Arithmetic
 
 (** [parse s] parses [s] into an AST. *)
 let parse (s : string) : expr =
@@ -25,17 +26,16 @@ let rec step : expr -> expr = function
 (** [step_bop bop v1 v2] implements the primitive operation
     [v1 bop v2].  Requires: [v1] and [v2] are both values. *)
 and step_bop bop e1 e2 = match bop, e1, e2 with
-  | Add, Float a, Float b -> Float (a +. b) (* this is where i would call the methods from arithmetic.ml *)
-  | Mult, Float a, Float b -> Float (a *. b)
-  | Subt, Float a, Float b -> Float (a -. b)
-  | Div, Float a, Float b -> Float (a /. b)
+  | Add, Float a, Float b -> Float(Arithmetic_Functions.add2 [a;b]) (* this is where i would call the methods from arithmetic.ml *)
+  | Mult, Float a, Float b -> Float (Arithmetic_Functions.multiply [a;b])
+  | Subt, Float a, Float b -> Float (Arithmetic_Functions.subtract [a;b])
+  | Div, Float a, Float b -> Float (Arithmetic_Functions.divide [a;b])
   | _ -> failwith "precondition violated"
 
 (** [eval e] fully evaluates [e] to a value. *)
 let rec eval (e : expr) : expr =
   if is_value e then e
   else e |> step |> eval
-
 
 (** [string_of_val e] converts [e] to a string.
     Requires: [e] is a value. *)
@@ -55,3 +55,4 @@ let rec main () =
   |e -> print_endline (interp e); print_endline ""; main ()
 
 let () = main ()
+

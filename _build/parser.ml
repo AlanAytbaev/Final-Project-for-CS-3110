@@ -298,7 +298,7 @@ and prog : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (
         _menhir_env._menhir_error <- true;
         _menhir_errorcase _menhir_env (Obj.magic _menhir_stack) MenhirState0)
 
-# 269 "/Users/emilyweed/.opam/4.08.1/lib/menhir/standard.mly"
+# 269 "<standard.mly>"
   
 
 # 305 "parser.ml"
