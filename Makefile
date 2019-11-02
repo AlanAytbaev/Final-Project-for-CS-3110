@@ -1,15 +1,22 @@
-default: build 
-      utop
+MODULES=lexer parser arithmetic 
+OBJECTS=$(MODULES:=.cmo)
+MLS=$(MODULES:=.ml)
+MLIS=$(MODULES:=.mli)
+TEST=test.byte
+OCAMLBUILD=ocamlbuild -use-ocamlfind
+PKGS=unix.oUnit
 
-build: 
-  ocamlbuild -use-ocamlfind main.byte
+default: build
+	utop
+
+build:
+	$(OCAMLBUILD) $(OBJECTS)
 
 test:
-  ocamlbuild -use-menhir -package oUnit -use-ocamlfind test.byte && ./test.byte
+	ocamlbuild -use-ocamlfind test.byte && ./test.byte
 
 clean:
-  ocamlbuild -clean
-
+	ocamlbuild -clean
 
 calc:
-  ocamlbuild -use-menhir main.byte && ./main.byte
+	ocamlbuild main.byte && ./main.byte
