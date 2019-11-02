@@ -1,9 +1,10 @@
-MODULES=lexer parser arithmetic 
+MODULES=lexer parser arithmetic main
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
-OCAMLBUILD=ocamlbuild -use-ocamlfind
+MAIN=main.byte
+OCAMLBUILD=ocamlbuild -use-ocamlfind -use-menhir
 PKGS=unix.oUnit
 
 default: build
@@ -13,10 +14,10 @@ build:
 	$(OCAMLBUILD) $(OBJECTS)
 
 test:
-	ocamlbuild -use-ocamlfind test.byte && ./test.byte
+	$(OCAMLBUILD) -tag debug $(TEST) && ./$(TEST)
 
 clean:
 	ocamlbuild -clean
 
 calc:
-	ocamlbuild main.byte && ./main.byte
+	$(OCAMLBUILD) main.byte && ./main.byte
