@@ -1,7 +1,10 @@
-type expr = 
-  |Flt of float
-  |Var of string
-  |Add of expr * expr
-  |Mult of expr * expr
-  |Subt of expr * expr
-  |Div of expr * expr
+type bop =
+  |Add
+  |Mult
+  |Subt
+  |Div
+
+
+type expr =
+  |Float of float
+  |Binop of bop * expr * expr
