@@ -12,8 +12,8 @@ end
 module type Arithmetic_Funcs = sig
 
         (** [add s] returns the result of adding the first element of s to the
-            second element of s. *)
         val add : float list -> float
+            second element of s. *)
 
         (** [subtract s] returns the result of subtracting the first element of             s from the second element of s. *)
         val subtract : float list -> float
@@ -24,10 +24,9 @@ module type Arithmetic_Funcs = sig
         (** [divide s] returns the result of dividing the first element of s by             the second element of s. *)
         val divide : float list -> float
 
-        val exponetiation : float list -> float
+        val exponentiation : float list -> float
 
         val modulus : float list -> float
 
         val logarithm : float list -> float
-
 end
