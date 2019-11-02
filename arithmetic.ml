@@ -65,13 +65,13 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
         let rec log (a : float) (b : float) =
                 let n = (Float.compare a b) in
                 match n with
-                | _ when n < 0 -> 0
-                | _ -> 1 + log (Float.div a b) b
+                | _ when n <> 0 -> 0.0
+                | _ -> 1.0 +. log (Float.div a b) b
 
         let logarithm (s : float list) =
                 match s with
                 | [] -> failwith "InvalidInput"
-                | hd1::hd2::tl -> (hd1)
+                | hd1::hd2::tl -> log hd1 hd2
 end
 
 

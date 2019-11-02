@@ -28,7 +28,7 @@ File "arithmetic.ml", line 61, characters 16-163:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 _::[]
-File "arithmetic.ml", line 72, characters 16-116:
+File "arithmetic.ml", line 72, characters 16-122:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 _::[]
