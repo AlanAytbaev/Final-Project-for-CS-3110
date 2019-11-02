@@ -1,0 +1,9 @@
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: Start test calc test suite:0:float.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: Test calc test suite:0:float is successful.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: End test calc test suite:0:float.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: Start test calc test suite:2:mul1.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: Test calc test suite:2:mul1 is successful.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: End test calc test suite:2:mul1.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: Start test calc test suite:4:mul3.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: Test calc test suite:4:mul3 is successful.
+2019-11-02T16:33:51+00:00 dhcp-rhodes-2778.redrover.cornell.edu#01 I: End test calc test suite:4:mul3.

@@ -1,22 +1,23 @@
-default:
-	utop -init test.ml
-	
+MODULES=lexer parser arithmetic main
+OBJECTS=$(MODULES:=.cmo)
+MLS=$(MODULES:=.ml)
+MLIS=$(MODULES:=.mli)
+TEST=test.byte
+MAIN=main.byte
+OCAMLBUILD=ocamlbuild -use-ocamlfind -use-menhir
+PKGS=unix.oUnit
+
+default: build
+	utop
+
 build:
-	ocamlbuild -use-ocamlfind enigma.cmo enigma_test.cmo
+	$(OCAMLBUILD) $(OBJECTS)
 
 test:
-	ocamlbuild -use-ocamlfind -tag 'debug' enigma_test.byte && ./enigma_test.byte
-
-check:
-	bash checkenv.sh && bash checktypes.sh
-
-finalcheck: check
-	bash finalcheck.sh
-
-docs:
-	mkdir -p doc
-	ocamldoc -d doc -html test.ml
+	$(OCAMLBUILD) -tag debug $(TEST) && ./$(TEST)
 
 clean:
 	ocamlbuild -clean
-	rm -rf doc
+
+calc:
+	$(OCAMLBUILD) main.byte && ./main.byte
