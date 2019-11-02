@@ -10,9 +10,10 @@ end
 
 (** A module that implements the functions needed for the arithmetic cfu. A modu    le that matches [Arithmetic_Funcs] is suitable for use in [Arithmetic_CFU]. *)
 module type Arithmetic_Funcs = sig
+  (** [add s] returns the result of adding the first element of s to the
+      second element of s.*)
 
-  (** [add s] returns the result of adding the first element of s to the *)
-  val add : float list -> float
+  val add2 : float list -> float
 
   (** [subtract s] returns the result of subtracting the first element of             s from the second element of s. *)
   val subtract : float list -> float
@@ -29,3 +30,7 @@ module type Arithmetic_Funcs = sig
 
   val logarithm : float list -> float
 end
+
+module Arithmetic_Functions : Arithmetic_Funcs
+module Arithmetic_CFU : CFU_sig
+

@@ -11,7 +11,7 @@ rule read =
 parse
 |white { read lexbuf }
 |"+" { ADD }
-|"-" { SUBT }
+|"sub" { SUBT }
 |"*" { MULT }
 |"/" { DIV }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
