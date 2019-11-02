@@ -1,9 +1,10 @@
-type bop = 
+type bop =
   |Add
+  |Mult
   |Subt
   |Div
-  |Mult
 
-type expr = 
+
+type expr =
   |Float of float
   |Binop of bop * expr * expr

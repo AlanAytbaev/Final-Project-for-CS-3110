@@ -1,1 +1,1 @@
-test.ml: Arithmetic_Functions OUnit2
+test.ml: Arithmetic_Functions Ast Main OUnit2

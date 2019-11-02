@@ -34,33 +34,33 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
 
         let add (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl -> (Float.add hd1 hd2)
+
 
         let subtract (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl -> (Float.sub hd1 hd2)
+                | _ -> failwith "InvalidInput"
 
         let multiply (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl -> (Float.mul hd1 hd2)
+                | _ -> failwith "InvalidInput"
 
         let divide (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl -> (Float.div hd1 hd2)
+                | _ -> failwith "InvalidInput"
 
         let exponentiation (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl -> (hd1 ** hd2)
+                | _ -> failwith "InvalidInput"
 
         let modulus (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl ->  (Float.sub hd1 (Float.mul hd2 (Float.div hd1 hd2)))
+                | _ -> failwith "InvalidInput"
 
         let rec log (a : float) (b : float) =
                 let n = (Float.compare a b) in
@@ -70,8 +70,8 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
 
         let logarithm (s : float list) =
                 match s with
-                | [] -> failwith "InvalidInput"
                 | hd1::hd2::tl -> log hd1 hd2
+                | _ -> failwith "InvalidInput"
 end
 
 module Arithmetic_CFU : CFU_sig = struct

@@ -1,18 +1,18 @@
 {
   open Parser
+  open Lexing
 }
 
-let white = [' ''\t']+
+let white = [' ' '\t']+
 let digit = ['0'-'9']
-let float = '-'?digit+
+let float = '-'? digit+ '.'? digit*
 
-rule read = 
-  parse 
-    | white { read lexbuf }
-    | "+" { ADD } 
-    | "-" { SUBT }
-    | "*" { MULT }
-    | "/" { DIV }
-    | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
-    | eof { EOF }
-
+rule read =
+parse
+|white { read lexbuf }
+|"+" { ADD }
+|"-" { SUBT }
+|"*" { MULT }
+|"/" { DIV }
+|float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
+|eof { EOF }
