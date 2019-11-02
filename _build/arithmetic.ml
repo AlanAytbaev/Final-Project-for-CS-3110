@@ -35,6 +35,7 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
         let add (s : float list) =
                 match s with
                 | hd1::hd2::tl -> (Float.add hd1 hd2)
+                | _ -> failwith "InvalidInput"
 
 
         let subtract (s : float list) =
