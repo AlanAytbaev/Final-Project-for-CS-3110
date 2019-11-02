@@ -1,7 +1,7 @@
 open OUnit2
 open Ast
 open Main
-open Arithmetic_Functions
+(* open Arithmetic_Functions *)
 
 (** [make_i n i s] makes an OUnit test named [n] that expects
     [s] to evalute to [Int i]. *)
@@ -21,7 +21,7 @@ let tests = [
 ]
 
 (**
-let test_arithmetic =
+   let test_arithmetic =
         assert_equal 3. (add [1.; 2.])
         assert_equal 1. (subtract [2.; 1.])
         assert_equal 4. (multiply [2.; 2.])

@@ -2,7 +2,6 @@ open Ast
 open Stdlib
 open ANSITerminal
 
-
 (** [parse s] parses [s] into an AST. *)
 let parse (s : string) : expr =
   let lexbuf = Lexing.from_string s in

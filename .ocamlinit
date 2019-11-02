@@ -4,4 +4,4 @@
 #load "parser.cmo";;
 #load "main.cmo";;
 open Ast;;
-open Main;
+open Main;;
