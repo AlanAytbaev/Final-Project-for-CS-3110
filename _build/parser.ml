@@ -147,7 +147,7 @@ and _menhir_goto_expr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.expr) 
             let _2 = () in
             let _v : (Ast.expr) = 
 # 28 "parser.mly"
-                            ( Binop (Subt, e1, e2) )
+                            ( Binop (Func "-", e1, e2) )
 # 152 "parser.ml"
              in
             _menhir_goto_expr _menhir_env _menhir_stack _menhir_s _v
@@ -170,7 +170,7 @@ and _menhir_goto_expr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.expr) 
             let _2 = () in
             let _v : (Ast.expr) = 
 # 29 "parser.mly"
-                            ( Binop (Mult, e1, e2) )
+                            ( Binop (Func "*", e1, e2) )
 # 175 "parser.ml"
              in
             _menhir_goto_expr _menhir_env _menhir_stack _menhir_s _v
@@ -187,7 +187,7 @@ and _menhir_goto_expr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.expr) 
         let _2 = () in
         let _v : (Ast.expr) = 
 # 30 "parser.mly"
-                           ( Binop (Div, e1, e2) )
+                           ( Binop (Func "/", e1, e2) )
 # 192 "parser.ml"
          in
         _menhir_goto_expr _menhir_env _menhir_stack _menhir_s _v
@@ -208,7 +208,7 @@ and _menhir_goto_expr : _menhir_env -> 'ttv_tail -> _menhir_state -> (Ast.expr) 
             let _2 = () in
             let _v : (Ast.expr) = 
 # 27 "parser.mly"
-                           ( Binop (Add, e1, e2) )
+                           ( Binop (Func "+", e1, e2) )
 # 213 "parser.ml"
              in
             _menhir_goto_expr _menhir_env _menhir_stack _menhir_s _v
