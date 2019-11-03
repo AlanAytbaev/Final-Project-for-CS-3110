@@ -55,3 +55,5 @@ let rec main () =
 
 let () = main ()
 
+let test_function x = x
+
