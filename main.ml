@@ -12,7 +12,7 @@ let parse (s : string) : expr =
 (** [is_value e] is whether [e] is a value. *)
 let is_value : expr -> bool = function
   | Float _ -> true
-  | Binop _ -> false
+  | _ -> false
 
 (** [step e] takes a single step of evaluation of [e]. *)
 let rec step : expr -> expr = function
@@ -26,10 +26,8 @@ let rec step : expr -> expr = function
 (** [step_bop bop v1 v2] implements the primitive operation
     [v1 bop v2].  Requires: [v1] and [v2] are both values. *)
 and step_bop bop e1 e2 = match bop, e1, e2 with
-  | Add, Float a, Float b -> Float(Arithmetic_Functions.add2 [a;b])
-  | Mult, Float a, Float b -> Float (Arithmetic_Functions.multiply [a;b])
-  | Subt, Float a, Float b -> Float (Arithmetic_Functions.subtract [a;b])
-  | Div, Float a, Float b -> Float (Arithmetic_Functions.divide [a;b])
+  | Func str, Float a, Float b -> 
+    Float ((Arithmetic_CFU.find_function str) [a;b])
   | _ -> failwith "precondition violated"
 
 (** [eval e] fully evaluates [e] to a value. *)
@@ -54,6 +52,8 @@ let rec main () =
   |"quit" -> ()
   |e -> print_endline (interp e); print_endline ""; main ()
 
+
 let () = main ()
 
 let test_function x = x
+
