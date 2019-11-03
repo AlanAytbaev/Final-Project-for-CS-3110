@@ -17,6 +17,9 @@ module type CFU_sig = sig
   (** An [operation_list] is an association list that maps operation symbols 
       to functions *)
   val operation_list : (string * ( primitive  list -> primitive )) list
+  (** [find s] is the operation that is associated with [s] in the operation 
+      list *)
+  val find_function : string -> (float list -> float)
 end
 
 module Arithmetic_Functions : Arithmetic_Funcs = struct
@@ -76,4 +79,10 @@ module Arithmetic_CFU : CFU_sig = struct
     ("%", Arithmetic_Functions.modulus);
     ("log", Arithmetic_Functions.logarithm)
   ]
+
+  let find_function (identifier : string) = 
+    match List.assoc_opt identifier operation_list with 
+    |Some f -> f
+    |None -> failwith (identifier^" is not a valid imported function")
+
 end

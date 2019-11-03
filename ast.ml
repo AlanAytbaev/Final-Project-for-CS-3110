@@ -3,6 +3,7 @@ type bop =
   |Mult
   |Subt
   |Div
+  |Func of string
 
 
 type expr =
