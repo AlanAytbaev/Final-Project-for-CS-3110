@@ -7,5 +7,7 @@ type bop =
 
 
 type expr =
+  |Var of string
   |Float of float
   |Binop of bop * expr * expr
+  |Let of string * expr 
