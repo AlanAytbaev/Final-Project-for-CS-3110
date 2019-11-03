@@ -4,14 +4,14 @@
 
 module type Environment_sig = sig
 
-  (** type v is the type of the value stored in memory. *)
-  type v
-
   (** type k is the type of the key in the memory_bindings. *)
   type k
 
+  (** type v is the type of the value stored in memory. *)
+  type v
+
   (** type t is the type of the memory_bindings. *)
-  type t 
+  type t
 
   (** [empty] is the empty memory_bindings. *)
   val empty : t
@@ -43,5 +43,8 @@ module type Environment_sig = sig
       otherwise is false. *)
   val member : k -> t -> bool
 
+  (** [format_bindings b] returns a string with the bindings in b formatted
+       to be printed to the user
+  val format_bindings : t -> string *)
 end
 module Environment : Environment_sig

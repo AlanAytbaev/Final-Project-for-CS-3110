@@ -5,11 +5,11 @@
 
 module type Environment_sig = sig
 
-  (** type v is the type of the value stored in memory. *)
-  type v
-
   (** type k is the type of the key in the memory_bindings. *)
   type k
+
+  (** type v is the type of the value stored in memory. *)
+  type v
 
   (** type t is the type of the memory_bindings. *)
   type t
@@ -43,6 +43,10 @@ module type Environment_sig = sig
   (** [member key] is true if key corresponds to a key in memory_bindings
       otherwise is false. *)
   val member : k -> t -> bool
+
+  (** [format_bindings b] returns a string with the bindings in b formatted
+       to be printed to the user
+  val format_bindings : t -> string *)
 end
 
 
@@ -51,11 +55,11 @@ end
     the calculator parsing statement(s)*)
 module Environment : Environment_sig = struct
 
-  (** type v is the type of the value stored in memory. *)
-  type v = string
-
   (** type k is the type of the key in the memory_bindings. *)
-  type k = float
+  type k = string
+
+  (** type v is the type of the value stored in memory. *)
+  type v = float
 
   (** type t is the type of the memory_bindings. *)
   type t = (k * v) list
@@ -77,8 +81,8 @@ module Environment : Environment_sig = struct
 
   (** [add_binding s t] adds a new binding s with value t to memory_bindings.
       Returns the value t. *)
-  let add_binding k v mb = 
-    if (List.mem_assoc k mb) 
+  let add_binding k v mb =
+    if (List.mem_assoc k mb)
     then begin let new_list = (List.remove_assoc k mb) in (k,v) :: new_list end
     else (k,v) :: mb
 
@@ -99,4 +103,12 @@ module Environment : Environment_sig = struct
       otherwise is false. *)
   let member key mb =
     (List.mem_assoc key mb)
+
+  (** [format_bindings b] returns a string with the bindings in b formatted
+      to be printed to the user
+  let format_bindings (b : t) =
+    match b with
+    | [] -> ""
+    | hd::tl -> let (key, val) = hd in
+      String.concat "" [key;(string_of_float val);] *)
 end
