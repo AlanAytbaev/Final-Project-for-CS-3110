@@ -10,7 +10,7 @@ module type Environment_sig = sig
           type k
 
           (** type t is the type of the memory_bindings. *)
-          type t : (k * v) list
+          type t
 
           (** [empty] is the empty memory_bindings. *)
           val empty : t
