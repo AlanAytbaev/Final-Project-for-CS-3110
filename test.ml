@@ -1,7 +1,7 @@
 open OUnit2
 open Ast
 open Main
-(* open Arithmetic_Functions *)
+open Arithmetic
 
 (** [make_i n i s] makes an OUnit test named [n] that expects
     [s] to evalute to [Int i]. *)
@@ -17,20 +17,7 @@ let tests = [
   make_i "mul2" 22. "2+2*10";
   make_i "mul3" 14. "2*2+10";
   make_i "mul4" 40. "2*2*10";
-
 ]
-
-(**
-   let test_arithmetic =
-        assert_equal 3. (add [1.; 2.])
-        assert_equal 1. (subtract [2.; 1.])
-        assert_equal 4. (multiply [2.; 2.])
-        assert_equal 1. (divide [1.; 1.])
-        assert_equal 4. (exponentiation [2.; 2.])
-        assert_equal 0. (modulus [6.; 6.])
-        assert_equal 1. (logarithm [1.; 1.])
-*)
-
 
 let suite = "calc test suite" >::: tests
 

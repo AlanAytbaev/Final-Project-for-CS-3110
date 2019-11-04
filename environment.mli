@@ -4,9 +4,14 @@
 
 module type Environment_sig = sig
 
+  (** type k is the type of the key in the memory_bindings. *)
+  type k
+
+  (** type v is the type of the value stored in memory. *)
+  type v
 
   (** type t is the type of the memory_bindings. *)
-  type t 
+  type t
 
   (** [empty] is the empty memory_bindings. *)
   val empty : t
@@ -20,23 +25,26 @@ module type Environment_sig = sig
   val memory_bindings : t
 
   (** [contains k t] is true if k is in t. Otherwise is false. *)
-  val contains : string -> t -> bool
+  val contains : k -> t -> bool
 
   (** [add_binding s t] adds a new binding s with value t to memory_bindings.
       Returns the new list. *)
-  val add_binding : string -> float -> t -> t
+  val add_binding : k -> v -> t -> t
 
   (** [remove_binding s] removes the binding in memory_bindings that
       corresponds with key. returns new_list*)
-  val remove_binding : string -> t -> t
+  val remove_binding : k -> t -> t
 
   (** [get_val key] returns the value that is bound in memory_bindings
       that corresponds to key. *)
-  val get_val : string -> t -> float
+  val get_val : k -> t -> v
 
   (** [member key] is true if key corresponds to a key in memory_bindings
       otherwise is false. *)
-  val member : string -> t -> bool
+  val member : k -> t -> bool
 
+  (** [format_bindings b] returns a string with the bindings in b formatted
+       to be printed to the user
+  val format_bindings : t -> string *)
 end
 module Environment : Environment_sig
