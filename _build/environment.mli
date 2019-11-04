@@ -35,7 +35,7 @@ module type Environment_sig = sig
 
   (** [member key] is true if key corresponds to a key in memory_bindings
       otherwise is false. *)
-  val member : string -> float -> bool
+  val member : string -> t -> bool
 
   (** [format_bindings b] returns a string with the bindings in b formatted
        to be printed to the user
