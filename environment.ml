@@ -1,15 +1,8 @@
 (** [Environment_sig] is a module meant to define environment of the calculator.
-    emw232
     This module contains the array of local memory bindings which are the result of
     the calculator parsing statement(s) *)
 
 module type Environment_sig = sig
-
-  (** type k is the type of the key in the memory_bindings. *)
-  type k
-
-  (** type v is the type of the value stored in memory. *)
-  type v
 
   (** type t is the type of the memory_bindings. *)
   type t
@@ -26,23 +19,23 @@ module type Environment_sig = sig
   val memory_bindings : t
 
   (** [contains k t] is true if k is in t. Otherwise is false. *)
-  val contains : k -> t -> bool
+  val contains : string -> t -> bool
 
   (** [add_binding s t] adds a new binding s with value t to memory_bindings.
       Returns the new list. *)
-  val add_binding : k -> v -> t -> t
+  val add_binding : string -> float -> t -> t
 
   (** [remove_binding s] removes the binding in memory_bindings that
       corresponds with key. returns new_list*)
-  val remove_binding : k -> t -> t
+  val remove_binding : string -> t -> t
 
   (** [get_val key] returns the value that is bound in memory_bindings
       that corresponds to key. *)
-  val get_val : k -> t -> v
+  val get_val : string -> t -> float
 
   (** [member key] is true if key corresponds to a key in memory_bindings
       otherwise is false. *)
-  val member : k -> t -> bool
+  val member : string -> float -> bool
 
   (** [format_bindings b] returns a string with the bindings in b formatted
        to be printed to the user
@@ -55,14 +48,8 @@ end
     the calculator parsing statement(s)*)
 module Environment : Environment_sig = struct
 
-  (** type k is the type of the key in the memory_bindings. *)
-  type k = string
-
-  (** type v is the type of the value stored in memory. *)
-  type v = float
-
   (** type t is the type of the memory_bindings. *)
-  type t = (k * v) list
+  type t = (string * float) list
 
   (** [empty] is the empty memory_bindings. *)
   let empty = []
