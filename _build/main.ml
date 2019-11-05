@@ -12,14 +12,14 @@ let parse (s : string) : expr =
 
 (** [is_value e] is whether [e] is a value. *)
 let is_value : expr -> bool = function
-  | Float _ | Bool _ -> true
+  | Float _ | Boolean _ -> true
   | Var _ |Let _ |Binop _ | If _ -> false
 
 (** [step e] takes a single step of evaluation of [e]. *)
 let rec step (curr_env:Environment.t) : expr -> expr = function
   | Float _ -> failwith "Does not step"
   | Var _ -> failwith "can't do"
-  | Bool _ -> failwith "naw"
+  | Boolean _ -> failwith "naw"
   | Binop (bop, e1, e2) when is_value e1 && is_value e2 ->
     step_bop bop e1 e2
   | Binop (bop, e1, e2) when is_value e1 ->
@@ -27,8 +27,8 @@ let rec step (curr_env:Environment.t) : expr -> expr = function
   | Binop (bop, e1, e2) -> Binop (bop, step curr_env e1, e2)
   | Let (x, Float e1) -> let y = (Environment.add_binding x e1 curr_env) in Float(Environment.get_val x y)
   | Let (x, e1) -> Let (x, step curr_env e1)
-  | If (Bool true, e2, _) -> e2
-  | If (Bool false, _, e3) -> e3
+  | If (Boolean true, e2, _) -> e2
+  | If (Boolean false, _, e3) -> e3
   | If (Float _, _, _) -> failwith "if_guard_err"
   | If (e1, e2, e3) -> If (step curr_env e1, e2, e3)
 
@@ -51,6 +51,7 @@ let rec eval (curr_env:Environment.t) (e : expr) : expr =
 let string_of_val (e : expr) : string =
   match e with
   |Float i -> string_of_float i
+  |Boolean b -> string_of_bool b
   |_ -> failwith "precondition violated"
 
 (** [interp s] interprets [s] by parsing and evaluating it. *)

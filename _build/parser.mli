@@ -13,6 +13,7 @@ type token =
   | EOF
   | ELSE
   | DIV
+  | BOOL of (bool)
   | ADD
 
 (* This exception is raised by the monolithic API functions. *)

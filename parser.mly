@@ -2,6 +2,7 @@
 open Ast
 %}
 
+%token <bool> BOOL
 %token <float> FLT
 %token <string> ID
 %token ADD
@@ -30,6 +31,7 @@ prog:
 
 expr:
 |f = FLT { Float f }
+|b = BOOL { Boolean b }
 |e1 = expr; ADD; e2 = expr { Binop (Func "+", e1, e2) }
 |e1 = expr; SUBT; e2 = expr { Binop (Func "-", e1, e2) }
 |e1 = expr; MULT; e2 = expr { Binop (Func "*", e1, e2) }

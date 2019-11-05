@@ -7,6 +7,7 @@ let white = [' ' '\t']+
 let digit = ['0'-'9']
 let float = '-'? digit+ '.'? digit*
 let letter = ['a'-'z' 'A'-'Z']
+let bool_id = "true\\|false"
 let id = letter+
 
 rule read =
@@ -16,11 +17,12 @@ parse
 |"sub" { SUBT }
 |"*" { MULT }
 |"/" { DIV }
-| "let" { LET }
-| "=" { EQUALS }
-| id { ID (Lexing.lexeme lexbuf) }
+|"let" { LET }
+|"=" { EQUALS }
+|"if" { IF }
+|"then" { THEN }
+|"else" { ELSE }
+|id { BOOL (bool_of_string (Lexing.lexeme lexbuf))}
+|id { ID (Lexing.lexeme lexbuf) }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
 |eof { EOF }
-| "if" { IF }
-| "then" { THEN }
-| "else" { ELSE }

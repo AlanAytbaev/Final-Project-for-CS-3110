@@ -5,11 +5,10 @@ type bop =
   |Div
   |Func of string
 
-
 type expr =
   |Var of string
   |Float of float
   |Binop of bop * expr * expr
-  |Bool of bool
+  |Boolean of bool
   |Let of string * expr
   |If of expr * expr * expr

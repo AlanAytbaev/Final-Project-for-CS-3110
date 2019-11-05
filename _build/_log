@@ -34,13 +34,13 @@ ocamlfind ocamldep -package oUnit -package ANSITerminal -modules arithmetic.ml >
 # Target: arithmetic.cmo, tags: { package(ANSITerminal), package(oUnit), byte, compile, extension:cmo, extension:ml, file:arithmetic.cmo, file:arithmetic.ml, implem, ocaml, quiet, traverse, use_menhir }
 ocamlfind ocamlc -c -package oUnit -package ANSITerminal -o arithmetic.cmo arithmetic.ml # cached
 # Target: environment.ml.depends, tags: { package(ANSITerminal), package(oUnit), extension:ml, file:environment.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
-ocamlfind ocamldep -package oUnit -package ANSITerminal -modules environment.ml > environment.ml.depends # cached
-# Target: environment.cmo, tags: { package(ANSITerminal), package(oUnit), byte, compile, extension:cmo, extension:ml, file:environment.cmo, file:environment.ml, implem, ocaml, quiet, traverse, use_menhir }
-ocamlfind ocamlc -c -package oUnit -package ANSITerminal -o environment.cmo environment.ml # cached
+ocamlfind ocamldep -package oUnit -package ANSITerminal -modules environment.ml > environment.ml.depends
 # Target: parser.ml.depends, tags: { package(ANSITerminal), package(oUnit), extension:ml, file:parser.ml, ocaml, ocamldep, quiet, traverse, use_menhir }
 ocamlfind ocamldep -package oUnit -package ANSITerminal -modules parser.ml > parser.ml.depends # cached
 # Target: parser.cmo, tags: { package(ANSITerminal), package(oUnit), byte, compile, extension:cmo, extension:ml, file:parser.cmo, file:parser.ml, implem, ocaml, quiet, traverse, use_menhir }
 ocamlfind ocamlc -c -package oUnit -package ANSITerminal -o parser.cmo parser.ml # cached
+# Target: environment.cmo, tags: { package(ANSITerminal), package(oUnit), byte, compile, extension:cmo, extension:ml, file:environment.cmo, file:environment.ml, implem, ocaml, quiet, traverse, use_menhir }
+ocamlfind ocamlc -c -package oUnit -package ANSITerminal -o environment.cmo environment.ml
 # Target: main.byte, tags: { package(ANSITerminal), package(oUnit), byte, dont_link_with, extension:byte, file:main.byte, link, ocaml, program, quiet, traverse, use_menhir }
-ocamlfind ocamlc -linkpkg -package oUnit -package ANSITerminal arithmetic.cmo ast.cmo environment.cmo parser.cmo lexer.cmo main.cmo -o main.byte # cached
+ocamlfind ocamlc -linkpkg -package oUnit -package ANSITerminal arithmetic.cmo ast.cmo environment.cmo parser.cmo lexer.cmo main.cmo -o main.byte
 # Compilation successful.
