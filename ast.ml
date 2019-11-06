@@ -10,4 +10,4 @@ type expr =
   |Var of string
   |Float of float
   |Binop of bop * expr * expr
-  |Let of string * expr 
+  |Let of string * expr * expr
