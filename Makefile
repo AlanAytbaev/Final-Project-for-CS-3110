@@ -21,3 +21,5 @@ clean:
 
 calc:
 	$(OCAMLBUILD) main.byte && ./main.byte
+zip:
+	zip calculator.zip *.ml* _tags Makefile INSTALL.txt README.txt
