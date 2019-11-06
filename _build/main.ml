@@ -27,8 +27,8 @@ let rec step (curr_env:Environment.t) : expr -> expr = function
   | Binop (bop, e1, e2) -> Binop (bop, step curr_env e1, e2)
   | Let (x, Float e1) -> let y = (Environment.add_binding x e1 curr_env) in Float(Environment.get_val x y)
   | Let (x, e1) -> Let (x, step curr_env e1)
-  | If (Boolean true, e2, _) -> e2
-  | If (Boolean false, _, e3) -> e3
+  | If (Float 1.0, e2, _) -> e2
+  | If (Float 0.0, _, e3) -> e3
   | If (Float _, _, _) -> failwith "if_guard_err"
   | If (e1, e2, e3) -> If (step curr_env e1, e2, e3)
 
