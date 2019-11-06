@@ -1,5 +1,5 @@
-(** A module that implements the functions needed for the arithmetic cfu. 
-    A module that matches [Arithmetic_Funcs] is suitable for use in 
+(** A module that implements the functions needed for the arithmetic cfu.
+    A module that matches [Arithmetic_Funcs] is suitable for use in
     [Arithmetic_CFU]. *)
 module type Arithmetic_Funcs = sig
   val add2 : float list -> float
@@ -14,10 +14,10 @@ end
 module type CFU_sig = sig
   (** type primitive is the type of the value that the calculator works with*)
   type primitive
-  (** An [operation_list] is an association list that maps operation symbols 
+  (** An [operation_list] is an association list that maps operation symbols
       to functions *)
   val operation_list : (string * ( primitive  list -> primitive )) list
-  (** [find s] is the operation that is associated with [s] in the operation 
+  (** [find s] is the operation that is associated with [s] in the operation
       list *)
   val find_function : string -> (float list -> float)
 end
@@ -51,7 +51,7 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
 
   let modulus (s : float list) =
     match s with
-    | hd1::hd2::tl ->  (Float.sub hd1 (Float.mul hd2 (Float.div hd1 hd2)))
+    | hd1::hd2::tl ->  Stdlib.mod_float hd1 hd2
     | _ -> failwith "InvalidInput"
 
   let rec log (a : float) (b : float) =
@@ -80,8 +80,8 @@ module Arithmetic_CFU : CFU_sig = struct
     ("log", Arithmetic_Functions.logarithm)
   ]
 
-  let find_function (identifier : string) = 
-    match List.assoc_opt identifier operation_list with 
+  let find_function (identifier : string) =
+    match List.assoc_opt identifier operation_list with
     |Some f -> f
     |None -> failwith (identifier^" is not a valid imported function")
 

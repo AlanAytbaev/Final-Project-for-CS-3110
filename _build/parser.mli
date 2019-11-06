@@ -5,10 +5,13 @@ type token =
   | THEN
   | SUBT
   | MULT
+  | MOD
+  | LOG
   | LET
   | IF
   | ID of (string)
   | FLT of (float)
+  | EXP
   | EQUALS
   | EOF
   | ELSE

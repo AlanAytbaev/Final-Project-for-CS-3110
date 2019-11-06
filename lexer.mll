@@ -14,6 +14,9 @@ rule read =
 parse
 |white { read lexbuf }
 |"+" { ADD }
+|"%" { MOD }
+|"^" { EXP }
+|"log" { LOG }
 |"sub" { SUBT }
 |"*" { MULT }
 |"/" { DIV }
