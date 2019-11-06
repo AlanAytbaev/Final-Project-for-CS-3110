@@ -4,36 +4,34 @@ open ANSITerminal
 open Arithmetic
 open Environment
 
-
 (** [parse s] parses [s] into an AST. *)
-let parse (s : string) : expr = 
+let parse (s : string) : expr =
   let lexbuf = Lexing.from_string s in
   let ast = Parser.prog Lexer.read lexbuf in
   ast
-
-
 
 (** [is_value e] is whether [e] is a value. *)
 let is_value : expr -> bool = function
   | Float _ | Boolean _ -> true
   | Var _ |Let _ |Binop _ | If _ -> false
 
-let rec step curr_env expr = 
-  match expr with 
-  | Float x -> Float x
-  | Var y -> 
-    Float (Environment.get_val y curr_env)
+(** [step e] takes a single step of evaluation of [e]. *)
+let rec step (curr_env:Environment.t) : expr -> expr = function
+  | Float _ -> failwith "Does not step"
+  | Var _ -> failwith "can't do"
   | Boolean _ -> failwith "naw"
   | Binop (bop, e1, e2) when is_value e1 && is_value e2 ->
-    step_bop bop e1 e2  
-  | Binop (bop, e1, e2) -> 
-    Binop (bop, step curr_env e1, step curr_env e2)
-  | Let (x, Float e1, e2) -> let y = (Environment.add_binding x e1 curr_env) in step y e2
-  | Let (x, e1, e2) -> Let (x, step curr_env e1, e2)
+    step_bop bop e1 e2
+  | Binop (bop, e1, e2) when is_value e1 ->
+    Binop (bop, e1, step curr_env e2)
+  | Binop (bop, e1, e2) -> Binop (bop, step curr_env e1, e2)
+  | Let (x, Float e1) -> let y = (Environment.add_binding x e1 curr_env) in Float(Environment.get_val x y)
+  | Let (x, e1) -> Let (x, step curr_env e1)
   | If (Float 1.0, e2, _) -> e2
   | If (Float 0.0, _, e3) -> e3
   | If (Float _, _, _) -> failwith "if_guard_err"
   | If (e1, e2, e3) -> If (step curr_env e1, e2, e3)
+
 
 (** [step_bop bop v1 v2] implements the primitive operation
     [v1 bop v2].  Requires: [v1] and [v2] are both values. *)
@@ -60,16 +58,14 @@ let string_of_val (e : expr) : string =
 let interp (s : string) (curr_env: Environment.t) : string =
   s |> parse |> eval curr_env |> string_of_val
 
-
-let rec main () curr_env =
+let rec main () =
+  let curr_env = Environment.empty in
   ANSITerminal.print_string [red] ">";
   match String.trim (String.lowercase_ascii (read_line())) with
   |"quit" -> ()
-  |e -> match (interp e curr_env) with
-    |exception Not_found -> main () curr_env
-    |s -> print_endline s;
-      print_endline ""; 
-      main () curr_env
+  |e -> print_endline (interp e curr_env); print_endline ""; main ()
 
-let () = main () (Environment.empty)
 
+let () = main ()
+
+let test_function x = x

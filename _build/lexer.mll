@@ -20,13 +20,12 @@ parse
 |"sub" { SUBT }
 |"*" { MULT }
 |"/" { DIV }
+|"let" { LET }
 |"==" { EQUALS }
 |"if" { IF }
 |"then" { THEN }
 |"else" { ELSE }
-|"let" { LET }
-|"=" { EQUALS }
-|"in" { IN }
+|id { BOOL (bool_of_string (Lexing.lexeme lexbuf))}
 |id { ID (Lexing.lexeme lexbuf) }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
 |eof { EOF }

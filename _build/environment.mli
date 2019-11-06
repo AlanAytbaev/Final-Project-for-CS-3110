@@ -40,14 +40,5 @@ module type Environment_sig = sig
   (** [format_bindings b] returns a string with the bindings in b formatted
        to be printed to the user
   val format_bindings : t -> string *)
-
-  (** [to_list t] is the string list representation of the association 
-      list [t] *)
-  val to_list : t -> string 
-
-  (** [choose t] is the value of the first binding of the association list*)
-  val choose : t -> string
-
-
 end
 module Environment : Environment_sig
