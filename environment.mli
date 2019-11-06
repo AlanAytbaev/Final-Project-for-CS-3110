@@ -4,7 +4,6 @@
 
 module type Environment_sig = sig
 
-
   (** type t is the type of the memory_bindings. *)
   type t 
 
@@ -37,6 +36,13 @@ module type Environment_sig = sig
   (** [member key] is true if key corresponds to a key in memory_bindings
       otherwise is false. *)
   val member : string -> t -> bool
+
+  (** [to_list t] is the string list representation of the association 
+      list [t] *)
+  val to_list : t -> string 
+
+  (** [choose t] is the value of the first binding of the association list*)
+  val choose : t -> string
 
 end
 module Environment : Environment_sig

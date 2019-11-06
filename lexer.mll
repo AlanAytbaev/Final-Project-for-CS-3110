@@ -18,6 +18,7 @@ parse
 |"/" { DIV }
 | "let" { LET }
 | "=" { EQUALS }
+| "in" { IN }
 | id { ID (Lexing.lexeme lexbuf) }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
 |eof { EOF }
