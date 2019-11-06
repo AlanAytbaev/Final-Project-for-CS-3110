@@ -6,6 +6,7 @@ type bop =
   |Exp
   |Mod
   |Log
+  |Equals
   |Func of string
 
 type expr =

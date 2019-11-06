@@ -26,6 +26,7 @@ open Ast
 %left MOD
 %left LOG
 %left EXP
+%left EQUALS
 
 %start <Ast.expr> prog
 
@@ -45,5 +46,6 @@ expr:
 |e1 = expr; MOD; e2 = expr { Binop (Func "%", e1, e2)}
 |e1 = expr; LOG; e2 = expr { Binop (Func "log", e1, e2)}
 |e1 = expr; EXP; e2 = expr { Binop (Func "^", e1, e2)}
+|e1 = expr; EQUALS; e2 = expr { Binop (Func "==", e1, e2)}
 |LET; x = ID; EQUALS; e1 = expr { Let (x, e1) }
 |IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }

@@ -21,7 +21,7 @@ parse
 |"*" { MULT }
 |"/" { DIV }
 |"let" { LET }
-|"=" { EQUALS }
+|"==" { EQUALS }
 |"if" { IF }
 |"then" { THEN }
 |"else" { ELSE }
