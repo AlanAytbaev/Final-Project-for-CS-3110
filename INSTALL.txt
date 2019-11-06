@@ -1,0 +1,25 @@
+The Modular Fodular Calculator
+==============================
+By Emily, Nathan, Alan, and Saranya
+
+
+Installation Instructions:
+
+	If you have not done so already, unzip the zipfile which contains this file using the appropriate tool.
+
+	Enter the directory containing these unzipped files.
+
+	Open a CLI session in this directory.
+
+	Run the command [make build] to create the build files.
+
+	Important: if there exists file main.byte, remove it using [rm main.byte] before operating.
+
+Operating Intructions:
+	
+	Install the calculator using the installation instructions above before running.
+
+	Run [make calc] to execute the calculator.
+
+Help:
+	Read this file again, but slowly.
