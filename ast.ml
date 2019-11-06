@@ -14,5 +14,5 @@ type expr =
   |Float of float
   |Binop of bop * expr * expr
   |Boolean of bool
-  |Let of string * expr
   |If of expr * expr * expr
+  |Let of string * expr * expr
