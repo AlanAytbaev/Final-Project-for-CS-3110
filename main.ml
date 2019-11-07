@@ -3,20 +3,35 @@ open Stdlib
 open ANSITerminal
 open Arithmetic
 open Environment
+open Lexing 
 
 
-(** [parse s] parses [s] into an AST. *)
-let parse (s : string) : expr = 
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.prog Lexer.read lexbuf in
-  ast
+exception SyntaxError of string
+exception UnexpectedError of string
 
+(** [parse_error lexbuf] is the error to raise when parser/lexeing raises 
+    a parsing or lexing error *)
+let parse_error lexbuf = raise (SyntaxError "Syntax error, please try again")
+
+(** [unexp_error lexbuf] is the error to raise when parser/lexeing fails *)
+let unexp_err lexbuf = raise (UnexpectedError "Unexepcted error, please try again")
+
+
+let parse parser_start s =
+  let lexbuf = from_string s in
+  try parser_start Lexer.read lexbuf with
+  | Parser.Error | Lexer.Syntax_error -> parse_error lexbuf
+  | Failure s -> unexp_err s 
+
+
+let parse_expr = parse Parser.prog
 
 
 (** [is_value e] is whether [e] is a value. *)
 let is_value : expr -> bool = function
   | Float _ | Boolean _ -> true
   | Var _ |Let _ |Binop _ | If _ -> false
+
 
 let rec step curr_env expr = 
   match expr with 
@@ -58,15 +73,25 @@ let string_of_val (e : expr) : string =
 
 (** [interp s] interprets [s] by parsing and evaluating it. *)
 let interp (s : string) (curr_env: Environment.t) : string =
-  s |> parse |> eval curr_env |> string_of_val
+  try (
+    s |> parse_expr |> eval curr_env |> string_of_val )
+  with
+  |SyntaxError s |Failure s -> s
+
+
+let rec help_command_helper chnl = 
+  match input_line chnl with
+  |s -> print_endline s; help_command_helper chnl
+  |exception End_of_file -> close_in chnl
 
 
 let rec main () curr_env =
   ANSITerminal.print_string [red] ">";
   match String.trim (String.lowercase_ascii (read_line())) with
   |"quit" -> ()
+  |"help" -> let chnl = open_in "help.txt" in help_command_helper chnl; main () curr_env
   |e -> match (interp e curr_env) with
-    |exception Not_found -> main () curr_env
+    |exception Not_found -> print_endline "Not a valid command please try again"; main () curr_env
     |s -> print_endline s;
       print_endline ""; 
       main () curr_env

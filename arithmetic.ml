@@ -58,7 +58,7 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
   let rec log (a : float) (b : float) =
     let n = (Float.compare a b) in
     match n with
-    | _ when n < 0 -> 0.0
+    | _ when n < 0 -> a
     | _ -> 1.0 +. log (Float.div a b) b
 
   let logarithm (s : float list) =
@@ -67,9 +67,9 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
     | _ -> failwith "InvalidInput"
 
   let equal_to (s : float list) =
-   match s with
-   | hd1::hd2::tl -> (if (hd1 = hd2) then 1.0 else 0.0)
-   | _ -> failwith "InvalidInput"
+    match s with
+    | hd1::hd2::tl -> (if (hd1 = hd2) then 1.0 else 0.0)
+    | _ -> failwith "InvalidInput"
 end
 
 module Arithmetic_CFU : CFU_sig = struct
