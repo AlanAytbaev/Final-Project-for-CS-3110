@@ -1,6 +1,9 @@
 {
   open Parser
   open Lexing
+
+  exception Syntax_error 
+
 }
 
 let white = [' ' '\t']+
@@ -9,6 +12,8 @@ let float = '-'? digit+ '.'? digit*
 let letter = ['a'-'z' 'A'-'Z']
 let bool_id = "true\\|false"
 let id = letter+
+
+
 
 rule read =
 parse
@@ -29,4 +34,5 @@ parse
 |"in" { IN }
 |id { ID (Lexing.lexeme lexbuf) }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
+|_ { raise (Syntax_error ) }
 |eof { EOF }
