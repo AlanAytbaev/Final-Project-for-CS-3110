@@ -16,3 +16,11 @@ type expr =
   |Boolean of bool
   |If of expr * expr * expr
   |Let of string * expr * expr
+
+
+type defn = 
+  |DLet of string * expr
+
+type phrase = 
+  | Expr of expr
+  | Defn of defn

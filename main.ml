@@ -5,6 +5,11 @@ open Arithmetic
 open Environment
 open Lexing 
 
+module Env = Map.Make(String)
+type env = value Env.t
+
+and value = Ast.expr
+
 
 exception SyntaxError of string
 exception UnexpectedError of string
@@ -24,7 +29,7 @@ let parse parser_start s =
   | Failure s -> unexp_err s 
 
 
-let parse_expr = parse Parser.prog
+let parse_phrase = parse Parser.prog
 
 
 (** [is_value e] is whether [e] is a value. *)
@@ -33,18 +38,18 @@ let is_value : expr -> bool = function
   | Var _ |Let _ |Binop _ | If _ -> false
 
 
-let rec step curr_env expr = 
+let rec step (curr_env:env) expr = 
   match expr with 
   | Float x -> Float x
-  | Var y -> 
-    Float (Environment.get_val y curr_env)
+  | Var y -> (Env.find y curr_env)
   | Boolean _ -> failwith "naw"
   | Binop (bop, e1, e2) when is_value e1 && is_value e2 ->
     step_bop bop e1 e2  
   | Binop (bop, e1, e2) -> 
     Binop (bop, step curr_env e1, step curr_env e2)
-  | Let (x, Float e1, e2) -> let y = (Environment.add_binding x e1 curr_env) in step y e2
-  | Let (x, e1, e2) -> Let (x, step curr_env e1, e2)
+  | Let (x, e1, e2) -> eval_let_expr curr_env x e1 e2
+  (* | Let (x, Float e1, e2) -> let y = (Env.add x e1 curr_env) in step y e2 *)
+  (* | Let (x, e1, e2) -> Let (x, step curr_env e1, e2) *)
   | If (Float 1.0, e2, _) -> e2
   | If (Float 0.0, _, e3) -> e3
   | If (Float _, _, _) -> failwith "if_guard_err"
@@ -58,25 +63,56 @@ and step_bop bop e1 e2 = match bop, e1, e2 with
   | _ -> failwith "precondition violated"
 
 
+and eval_let_expr env x e1 e2 =
+  let v1 = step env e1 in
+  let env' = Env.add x v1 env in
+  let v = step env' e2 in v
+
+
 (** [eval e] fully evaluates [e] to a value. *)
-let rec eval (curr_env:Environment.t) (e : expr) : expr =
-  if is_value e then e
+let rec eval (curr_env:env) (e : expr) =
+  if is_value e then (e, curr_env)
   else e |> step curr_env |> eval curr_env
 
 (** [string_of_val e] converts [e] to a string.
     Requires: [e] is a value. *)
-let string_of_val (e : expr) : string =
-  match e with
+let string_of_val e  =
+  match (fst e) with
   |Float i -> string_of_float i
   |Boolean b -> string_of_bool b
   |_ -> failwith "precondition violated"
 
+let eval_let_defn (env1:env) id e = 
+  let v = step env1 e in
+  let env' = Env.add id v env1 in
+  (v, env')
+
+let eval_defn env e = 
+  match e with 
+  |DLet (id, e1) -> eval_let_defn env id e1
+
+let rec eval_phrase env exp =
+  match exp with 
+  |Expr e -> eval env e
+  |Defn d -> eval_defn env d
+
 (** [interp s] interprets [s] by parsing and evaluating it. *)
-let interp (s : string) (curr_env: Environment.t) : string =
+(* let interp_expr (s : string) (curr_env: env) : string =
+   try (
+    s |> parse_phrase |> eval_phrase curr_env |> string_of_val )
+   with
+   |SyntaxError s |Failure s -> s *)
+
+(** [interp s] interprets [s] by parsing and evaluating it. *)
+let interp_defn (s : string) (curr_env: env) : (string * env) =
   try (
-    s |> parse_expr |> eval curr_env |> string_of_val )
+    let (v, env) = s |> parse_phrase |> eval_phrase curr_env in 
+    let s = (v, env) |> string_of_val in 
+    (s, env)
+  )
   with
-  |SyntaxError s |Failure s -> s
+  |SyntaxError s |Failure s -> (s, curr_env)
+
 
 
 let rec help_command_helper chnl = 
@@ -84,17 +120,16 @@ let rec help_command_helper chnl =
   |s -> print_endline s; help_command_helper chnl
   |exception End_of_file -> close_in chnl
 
-
 let rec main () curr_env =
   ANSITerminal.print_string [red] ">";
   match String.trim (String.lowercase_ascii (read_line())) with
   |"quit" -> ()
   |"help" -> let chnl = open_in "help.txt" in help_command_helper chnl; main () curr_env
-  |e -> match (interp e curr_env) with
+  |e -> match (interp_defn e curr_env) with
     |exception Not_found -> print_endline "Not a valid command please try again"; main () curr_env
-    |s -> print_endline s;
+    |(s, env) -> print_endline s;
       print_endline ""; 
-      main () curr_env
+      main () env
 
-let () = main () (Environment.empty)
+let () = main () (Env.empty)
 

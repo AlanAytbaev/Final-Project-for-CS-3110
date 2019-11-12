@@ -30,12 +30,13 @@ open Ast
 %left EXP
 %left EQUALS
 
-%start <Ast.expr> prog
+%start <Ast.phrase> prog
 
 %%
 
 prog:
-|e = expr; EOF { e }
+|e = expr; EOF { Expr e }
+|d = defn; EOF { Defn d }
 ;
 
 expr:
@@ -52,3 +53,7 @@ expr:
 |e1 = expr; EQUALS; e2 = expr { Binop (Func "==", e1, e2)}
 |IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
 |LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let (x, e1, e2) }
+
+defn:
+|LET; x = ID; EQUALS; e1 = expr { DLet (x, e1) }
+
