@@ -16,6 +16,8 @@ type expr =
   |Boolean of bool
   |If of expr * expr * expr
   |Let of string * expr * expr
+  |Fun of string list * expr
+  |FunApp of expr * expr list
 
 
 type defn = 

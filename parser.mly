@@ -1,5 +1,6 @@
 %{
 open Ast
+open List
 %}
 
 %token <bool> BOOL
@@ -19,6 +20,10 @@ open Ast
 %token ELSE
 %token EQUALS
 %token IN
+%token LPAREN 
+%token RPAREN
+%token FUN 
+%token ARROW
 
 %nonassoc IN
 %left ADD
@@ -40,9 +45,11 @@ prog:
 ;
 
 expr:
+|e = expr { e }
 |f = FLT { Float f }
 |b = BOOL { Boolean b }
 |x = ID { Var x }
+|e = expr; es = nonempty_list(expr) { FunApp (e, es) }
 |e1 = expr; ADD; e2 = expr { Binop (Func "+", e1, e2) }
 |e1 = expr; SUBT; e2 = expr { Binop (Func "-", e1, e2) }
 |e1 = expr; MULT; e2 = expr { Binop (Func "*", e1, e2) }
@@ -53,6 +60,7 @@ expr:
 |e1 = expr; EQUALS; e2 = expr { Binop (Func "==", e1, e2)}
 |IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
 |LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let (x, e1, e2) }
+|FUN; LPAREN; xs = nonempty_list(ID); RPAREN; ARROW; e = expr; { Fun (xs,e) }
 
 defn:
 |LET; x = ID; EQUALS; e1 = expr { DLet (x, e1) }
