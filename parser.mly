@@ -19,6 +19,14 @@ open Ast
 %token ELSE
 %token EQUALS
 %token IN
+%token SIN
+%token COS
+%token TAN
+%token SEC
+%token COSEC
+%token COTAN
+%token RAD
+%token DEG
 
 %nonassoc IN
 %left ADD
@@ -50,5 +58,13 @@ expr:
 |e1 = expr; LOG; e2 = expr { Binop (Func "log", e1, e2)}
 |e1 = expr; EXP; e2 = expr { Binop (Func "^", e1, e2)}
 |e1 = expr; EQUALS; e2 = expr { Binop (Func "==", e1, e2)}
+|e1 = expr; SIN; e2 = expr { Binop (Func "sin", e1, e2)}
+|e1 = expr; COS; e2 = expr { Binop (Func "cos", e1, e2)}
+|e1 = expr; TAN; e2 = expr { Binop (Func "tan", e1, e2)}
+|e1 = expr; SEC; e2 = expr { Binop (Func "sec", e1, e2)}
+|e1 = expr; COSEC; e2 = expr { Binop (Func "cosec", e1, e2)}
+|e1 = expr; COTAN; e2 = expr { Binop (Func "cotan", e1, e2)}
+|e1 = expr; RAD; e2 = expr { Binop (Func "rad", e1, e2)}
+|e1 = expr; DEG; e2 = expr { Binop (Func "deg", e1, e2)}
 |IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
 |LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let (x, e1, e2) }
