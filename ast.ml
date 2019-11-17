@@ -1,3 +1,5 @@
+
+type id = string
 type bop =
   |Add
   |Mult
@@ -9,20 +11,24 @@ type bop =
   |Equals
   |Func of string
 
-type expr =
+module Env = Map.Make (String)
+
+type env = expr Env.t
+and expr =
   |Var of string
   |Float of float
   |Binop of bop * expr * expr
   |Boolean of bool
   |If of expr * expr * expr
-  |Let of string * expr * expr
+  |Let of id * expr * expr
   |Fun of string list * expr
   |FunApp of expr * expr list
+  |Closure of expr * env
 
 
-type defn = 
+and defn = 
   |DLet of string * expr
 
-type phrase = 
+and phrase = 
   | Expr of expr
   | Defn of defn
