@@ -15,7 +15,7 @@ module Env = Map.Make (String)
 
 type env = expr Env.t
 and expr =
-  |Var of string
+  |Var of id
   |Float of float
   |Binop of bop * expr * expr
   |Boolean of bool
@@ -23,7 +23,7 @@ and expr =
   |Let of id * expr * expr
   |Fun of string list * expr
   |FunApp of expr * expr list
-  |Closure of expr * env
+  (* |Closure of expr * env *)
 
 
 and defn = 

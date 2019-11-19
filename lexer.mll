@@ -38,5 +38,6 @@ parse
 |")" {RPAREN}
 |id { ID (Lexing.lexeme lexbuf) }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
-|_ { raise (Syntax_error ) }
 |eof { EOF }
+|_ { raise (Syntax_error ) }
+
