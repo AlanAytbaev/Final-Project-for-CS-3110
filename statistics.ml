@@ -8,6 +8,7 @@ module type Statistics_Funcs = sig
   val mean_deviation : float list -> float
   val permutations : float -> float -> float
   val combinations : float -> float -> float
+  val factorial : float -> float
 end
 
 module Statistics_Functions : Statistics_Funcs = struct
@@ -47,11 +48,13 @@ module Statistics_Functions : Statistics_Funcs = struct
   let rec factorial (n : float) =
     match n with
     | 0 -> 1
-    | _ -> n *. (factorial (n - 1))
+    | _ -> n *. (factorial (n -. 1))
 
   let permutations (n : float) (r : float) =
-
+    (factorial n) /. (factorial (n -. r))
 
   let combinations (n : float) (r : float) =
+    (factorial n) /. ((factorial (n -. r)) *. (factorial r))
+end
 
 module type Statistics_CFU = struct
