@@ -17,7 +17,7 @@ module type CFU_sig = sig
   type primitive
   (** An [operation_list] is an association list that maps operation symbols
       to functions *)
-  val operation_list : (string * ( primitive  list -> primitive )) list
+  val operation_list : (string * ( primitive list -> primitive )) list
   (** [find s] is the operation that is associated with [s] in the operation
       list *)
   val find_function : string -> (float list -> float)

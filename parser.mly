@@ -10,6 +10,14 @@ open List
 %token LPAREN RPAREN ARROW
 %token FUN IN LET IF THEN ELSE 
 %token EOF
+%token SIN
+%token COS
+%token TAN
+%token SEC
+%token COSEC
+%token COTAN
+%token RAD
+%token DEG
 
 
 %nonassoc IN
@@ -62,3 +70,4 @@ defn:
 iden:
   | x = ID
         { x }
+

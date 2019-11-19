@@ -2,7 +2,7 @@
   open Parser
   open Lexing
 
-  exception Syntax_error 
+  exception Syntax_error
 
 }
 
@@ -25,6 +25,14 @@ parse
 |"sub" { SUBT }
 |"*" { MULT }
 |"/" { DIV }
+|"sin" { SIN }
+|"cos" { COS }
+|"tan" { TAN }
+|"sec" { SEC }
+|"cosec" { COSEC }
+|"cotan" { COTAN }
+|"rad" { RAD }
+|"deg" { DEG }
 |"==" { EQUALS }
 |"if" { IF }
 |"then" { THEN }

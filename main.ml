@@ -3,7 +3,8 @@ open Stdlib
 open ANSITerminal
 open Arithmetic
 open Environment
-open Lexing 
+open Lexing
+open Printf
 
 module Env = Map.Make(String)
 type env = value Env.t
@@ -20,7 +21,7 @@ and result =
 exception SyntaxError of string
 exception UnexpectedError of string
 
-(** [parse_error lexbuf] is the error to raise when parser/lexeing raises 
+(** [parse_error lexbuf] is the error to raise when parser/lexeing raises
     a parsing or lexing error *)
 let parse_error lexbuf = raise (SyntaxError "Syntax error, please try again")
 
@@ -32,7 +33,7 @@ let parse parser_start s =
   let lexbuf = from_string s in
   try parser_start Lexer.read lexbuf with
   | Parser.Error | Lexer.Syntax_error -> parse_error lexbuf
-  | Failure s -> unexp_err s 
+  | Failure s -> unexp_err s
 
 
 let parse_phrase = parse Parser.prog
@@ -69,6 +70,14 @@ let is_prim expr =
   |Float x -> true
   |Boolean b -> true
   |_ -> false
+
+let load_file f env =
+  let ic = open_in f in
+  let n = in_channel_length ic in
+  let s = Bytes.create n in
+  really_input ic s 0 n;
+  close_in ic;
+  (Bytes.unsafe_to_string s)
 
 
 let rec step (curr_env:env) expr = 
@@ -147,6 +156,7 @@ let rec eval (curr_env:env) (e : expr) =
 
 
 
+
 let eval_let_defn (env1:env) id e = 
   if is_prim e then
     let v = Val e in 
@@ -157,12 +167,12 @@ let eval_let_defn (env1:env) id e =
     let env' = Env.add id v env1 in
     (get_expr v, env')
 
-let eval_defn env e = 
-  match e with 
+let eval_defn env e =
+  match e with
   |DLet (id, e1) -> eval_let_defn env id e1
 
 let rec eval_phrase env exp =
-  match exp with 
+  match exp with
   |Expr e -> eval env e
   |Defn d -> eval_defn env d
 
@@ -181,7 +191,7 @@ let interp (s : string) (curr_env: env) : (string * env) =
 
 
 
-let rec help_command_helper chnl = 
+let rec help_command_helper chnl =
   match input_line chnl with
   |s -> print_endline s; help_command_helper chnl
   |exception End_of_file -> close_in chnl
@@ -194,8 +204,7 @@ let rec main () curr_env =
   |e -> match (interp e curr_env) with
     |exception Not_found -> print_endline "Not a valid command please try again"; main () curr_env
     |(s, env) -> print_endline s;
-      print_endline ""; 
+      print_endline "";
       main () env
 
 let () = main () (Env.empty)
-
