@@ -1,4 +1,10 @@
-help text file
-hello
-how
-are you
+Welcome to our calculator!
+Functions that can be preformed:
+- basic arithmetic ( +, sub, /, *, %, log )
+- trigonometry ( sin, cos, tan, cot, cosin, csc )
+- user-defined functions ( let <function name> = fun ( <argument list> ) -> <function body> )
+- function application ( <function name> <appropiate number of arguments> )
+- if then else statements where guard evaluates to a boolean or 1 -> true, 0 -> false
+- let definitions (let <variable name> = <value> )
+- let expressions ( let <variable name> = <value> in <expression body> )
+

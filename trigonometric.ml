@@ -30,48 +30,54 @@ module Trigonometric_Functions : Trigonometric_Funcs = struct
 
   let deg_to_rad (f : float list) =
     match f with
-    | hd :: tl -> Float.div (hd |> Float.mul Float.pi) 180.
+    | hd :: tl -> (Float.pi *. hd)/. 180.
     | _ -> failwith "InvalidInput"
 
   let rad_to_deg (f : float list) =
     match f with
-    | hd :: tl -> Float.div (hd |> Float.mul 180) Float.pi
+    | hd :: tl -> Float.div (hd |> Float.mul 180.) Float.pi
     | _ -> failwith "InvalidInput"
 
   let sin (f : float list) =
     match f with
-    | hd :: tl -> let x = deg_to_rad [hd] in
-      rad_to_deg (Float.sin x)
+    | hd :: tl -> if (int_of_float hd mod 180 = 0) then 0. else
+        let x = deg_to_rad [hd] in
+        Float.sin x
     | _ -> failwith "InvalidInput"
 
   let cos (f : float list) =
     match f with
-    | hd :: tl -> let x = deg_to_rad [hd] in
-      rad_to_deg (Float.cos x)
+    | hd :: tl -> if (int_of_float hd mod 90 = 0 && int_of_float hd mod 180 <> 0) then 0.
+      else let x = deg_to_rad [hd] in
+        Float.cos x
     | _ -> failwith "InvalidInput"
 
   let tan (f : float list) =
     match f with
-    | hd :: tl -> let x = deg_to_rad [hd] in
-      rad_to_deg (Float.tan x)
+    | hd :: tl -> if (int_of_float hd mod 180 = 0) then 0. else
+        let x = deg_to_rad [hd] in
+        Float.tan x
     | _ -> failwith "InvalidInput"
 
   let sec (f : float list) =
     match f with
-    | hd :: tl -> let x = deg_to_rad [hd] in
-      rad_to_deg (Float.div 1 (Float.cos x))
+    | hd :: tl -> if (int_of_float hd mod 90 = 0 && int_of_float hd mod 180 <> 0) then failwith "undefined" 
+      else let x = deg_to_rad [hd] in
+        Float.div 1. (Float.cos x)
     | _ -> failwith "InvalidInput"
 
   let cosec (f : float list) =
     match f with
-    | hd :: tl -> let x = deg_to_rad [hd] in
-      rad_to_deg (Float.div 1 (Float.sin x))
+    | hd :: tl -> if (int_of_float hd mod 180 = 0 ) then failwith "undefined"
+      else let x = deg_to_rad [hd] in
+        Float.div 1. (Float.sin x)
     | _ -> failwith "InvalidInput"
 
   let cotan (f : float list) =
     match f with
-    | hd :: tl -> let x = deg_to_rad [hd] in
-      rad_to_deg (Float.div 1 (Float.tan x))
+    | hd :: tl -> if (int_of_float hd mod 90 = 0 && int_of_float hd mod 180 <> 0) then failwith "undefined" 
+      else let x = deg_to_rad [hd] in
+        Float.div 1. (Float.tan x)
     | _ -> failwith "InvalidInput"
 end
 
@@ -86,8 +92,8 @@ module Trigonometric_CFU : CFU_sig = struct
     ("cos", Trigonometric_Functions.cos);
     ("tan", Trigonometric_Functions.tan);
     ("sec", Trigonometric_Functions.sec);
-    ("cosec", Trigonometric_Functions.cosec);
-    ("cotan", Trigonometric_Functions.cotan);
+    ("csc", Trigonometric_Functions.cosec);
+    ("cot", Trigonometric_Functions.cotan);
   ]
 
   let find_function (identifier : string) =

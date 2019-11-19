@@ -6,7 +6,7 @@ open Arithmetic
 (** [make_i n i s] makes an OUnit test named [n] that expects
     [s] to evalute to [Int i]. *)
 let make_i n i s =
-  n >:: (fun _ -> assert_equal (string_of_float i) (interp s))
+  n >:: (fun _ -> assert_equal (string_of_float i) (fst (Main.interp s Env.empty)))
 
 (* Add Tests Below Here *)
 
