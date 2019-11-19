@@ -1,24 +1,15 @@
 %{
 open Ast
+open List
 %}
 
 %token <bool> BOOL
 %token <float> FLT
 %token <string> ID
-%token ADD
-%token MULT
-%token LOG
-%token MOD
-%token EXP
-%token SUBT
-%token DIV
+%token ADD MULT LOG MOD EXP SUBT DIV EQUALS
+%token LPAREN RPAREN ARROW
+%token FUN IN LET IF THEN ELSE 
 %token EOF
-%token LET
-%token IF
-%token THEN
-%token ELSE
-%token EQUALS
-%token IN
 %token SIN
 %token COS
 %token TAN
@@ -28,15 +19,16 @@ open Ast
 %token RAD
 %token DEG
 
+
 %nonassoc IN
-%left ADD
-%left SUBT
-%left MULT
-%left DIV
-%left MOD
-%left LOG
-%left EXP
+%nonassoc THEN
+%nonassoc ELSE
+%nonassoc LET
+%right ARROW
 %left EQUALS
+%left ADD SUBT
+%left MULT DIV MOD LOG EXP
+
 
 %start <Ast.phrase> prog
 
@@ -48,9 +40,11 @@ prog:
 ;
 
 expr:
+|e = s_expr { e }
+|e = s_expr; es = nonempty_list(s_expr) { FunApp (e, es) }
 |f = FLT { Float f }
 |b = BOOL { Boolean b }
-|x = ID { Var x }
+|x = iden { Var x }
 |e1 = expr; ADD; e2 = expr { Binop (Func "+", e1, e2) }
 |e1 = expr; SUBT; e2 = expr { Binop (Func "-", e1, e2) }
 |e1 = expr; MULT; e2 = expr { Binop (Func "*", e1, e2) }
@@ -61,6 +55,19 @@ expr:
 |e1 = expr; EQUALS; e2 = expr { Binop (Func "==", e1, e2)}
 |IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
 |LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let (x, e1, e2) }
+|FUN; LPAREN; xs = nonempty_list(iden); RPAREN; ARROW; e = expr; { Fun (xs, e) }
+
+
+s_expr: 
+| x = iden { Var x }
+| LPAREN; e = expr; RPAREN
+        { e }
+
 
 defn:
 |LET; x = ID; EQUALS; e1 = expr { DLet (x, e1) }
+
+iden:
+  | x = ID
+        { x }
+
