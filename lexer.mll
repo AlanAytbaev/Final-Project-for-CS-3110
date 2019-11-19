@@ -25,14 +25,14 @@ parse
 |"sub" { SUBT }
 |"*" { MULT }
 |"/" { DIV }
+|"true" { TRUE }
+|"false" { FALSE }
 |"sin" { SIN }
 |"cos" { COS }
 |"tan" { TAN }
 |"sec" { SEC }
 |"csc" { CSC }
 |"cot" { COT }
-|"rad" { RAD }
-|"deg" { DEG }
 |"==" { EQUALS }
 |";" { SEMI }
 |"if" { IF }
@@ -49,4 +49,3 @@ parse
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
 |eof { EOF }
 |_ { raise (Syntax_error ) }
-

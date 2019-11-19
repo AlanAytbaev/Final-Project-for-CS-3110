@@ -8,6 +8,7 @@ open List
 %token <string> ID STRING
 %token ADD MULT LOG MOD EXP SUBT DIV EQUALS
 %token LPAREN RPAREN ARROW SEMI
+%token TRUE FALSE
 %token FUN IN LET IF THEN ELSE 
 %token EOF
 %token SIN
@@ -16,16 +17,15 @@ open List
 %token SEC
 %token CSC
 %token COT
-%token RAD
-%token DEG
+
 
 %nonassoc below_SEMI
 %nonassoc SEMI
-%nonassoc IN
+(* %nonassoc IN *)
 %nonassoc THEN
 %nonassoc ELSE
-%nonassoc LET
-%right ARROW
+(* %nonassoc LET *)
+(* %right ARROW *)
 %left EQUALS
 %left ADD SUBT
 %left MULT DIV MOD LOG EXP
@@ -58,6 +58,7 @@ expr:
 |e1 = expr; LOG; e2 = expr { Binop (Func "log", e1, e2)}
 |e1 = expr; EXP; e2 = expr { Binop (Func "^", e1, e2)}
 |e1 = expr; EQUALS; e2 = expr { Binop (Func "==", e1, e2)}
+|IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
 |IF; e1 = seq_expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
 |LET; x = ID; EQUALS; e1 = expr; IN; e2 = seq_expr { Let (x, e1, e2) }
 |FUN; LPAREN; xs = nonempty_list(iden); RPAREN; ARROW; e = seq_expr; { Fun (xs, e) }
@@ -76,6 +77,8 @@ s_expr:
 | s = FLT { Float s }
 | s = STRING { String s }
 | b = BOOL { Boolean b }
+| TRUE { Boolean true }
+| FALSE { Boolean false }
 
 
 defn:
@@ -84,6 +87,3 @@ defn:
 iden:
   | x = ID
         { x }
-
-
-
