@@ -29,11 +29,12 @@ parse
 |"cos" { COS }
 |"tan" { TAN }
 |"sec" { SEC }
-|"cosec" { COSEC }
-|"cotan" { COTAN }
+|"csc" { CSC }
+|"cot" { COT }
 |"rad" { RAD }
 |"deg" { DEG }
 |"==" { EQUALS }
+|";" { SEMI }
 |"if" { IF }
 |"then" { THEN }
 |"else" { ELSE }

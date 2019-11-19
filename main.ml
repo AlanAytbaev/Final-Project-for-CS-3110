@@ -5,6 +5,7 @@ open Arithmetic
 open Environment
 open Lexing
 open Printf
+open Trigonometric
 
 module Env = Map.Make(String)
 type env = value Env.t
@@ -45,12 +46,14 @@ let string_of_expr e =
   match e with
   |Float i -> string_of_float i
   |Boolean b -> string_of_bool b
+  |String s -> s
   |If _ -> "if expression"
   |Let _ -> "let"
   |Fun (s, e)-> "fun"
   |FunApp (s, e) -> "fun app"
   |Var x -> "var"
   |Binop _ -> "binop"
+  |Unop _ -> "unop"
 
 (** [string_of_val v] converts [v] to a string.
     Requires: [v] is a value. *)
@@ -84,6 +87,7 @@ let rec step (curr_env:env) expr =
   match expr with 
   | Float x -> Val (Float x)
   | Var y ->  Env.find y curr_env
+  |String s -> Val (String s)
   | Boolean b -> Val (Boolean b)
   | Binop (bop, e1, e2) when is_prim e1 && is_prim e2 ->
     step_bop bop e1 e2
@@ -96,7 +100,15 @@ let rec step (curr_env:env) expr =
   | If (e1, e2, e3) -> Val (If (get_expr(step curr_env e1), e2, e3))
   | Fun (s,e) -> Closure (s,e,curr_env)
   | FunApp (e1,e2) -> eval_fun e1 e2 curr_env
+  | Unop (unop, e) when is_prim e -> eval_unop unop e curr_env
+  | Unop (unop, e) -> Val (Unop (unop, get_expr(step curr_env e)))
+
 (* | Closure (e, env) -> Val (Closure (e, env)) *)
+
+and eval_unop uop e env = 
+  match uop, e with 
+  |Func_u str, Float a -> Val (Float ((Trigonometric_CFU.find_function str) [a]))
+  |_ -> failwith "precondition violated - step unop"
 
 and get_expr value = match value with
   |Val x -> x
@@ -108,6 +120,7 @@ and get_expr value = match value with
 and step_bop bop e1 e2 = match bop, e1, e2 with
   | Func str, Float a, Float b ->
     (Val (Float ((Arithmetic_CFU.find_function str) [a;b])))
+
   | _ -> failwith "precondition violated - step bop"
 
 and string_of_var e = match e with 

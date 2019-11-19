@@ -11,13 +11,25 @@ type bop =
   |Equals
   |Func of string
 
+type unop = 
+  |Sin 
+  |Cos 
+  |Tan 
+  |Sec 
+  |Csc 
+  |Cot
+  |Func_u of string
+
+
 module Env = Map.Make (String)
 
 type env = expr Env.t
 and expr =
   |Var of id
+  |String of string
   |Float of float
   |Binop of bop * expr * expr
+  |Unop of unop * expr
   |Boolean of bool
   |If of expr * expr * expr
   |Let of id * expr * expr
