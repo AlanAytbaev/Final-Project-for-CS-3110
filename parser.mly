@@ -45,6 +45,7 @@ seq_expr:
         { e }
   | e = expr; SEMI
         { e }
+
  
 
 expr:
@@ -69,12 +70,11 @@ expr:
 |CSC; e = expr { Unop (Func_u "csc", e) }
 |COT; e = expr { Unop (Func_u "cot", e) }
 
-
 s_expr: 
 | x = iden { Var x }
+| s = FLT { Float s }
 | LPAREN; e = seq_expr; RPAREN
         { e }
-| s = FLT { Float s }
 | s = STRING { String s }
 | b = BOOL { Boolean b }
 | TRUE { Boolean true }

@@ -1,3 +1,9 @@
+module type CFU_sig = sig
+  type primitive
+  val operation_list : (string * ( primitive  list -> primitive )) list
+  val find_function : string -> (float list -> float)
+end
+
 module type Statistics_Funcs = sig
   val mean : float list -> float
   val median : float list -> float
@@ -5,56 +11,84 @@ module type Statistics_Funcs = sig
   val range : float list -> float
   val min : float list -> float
   val max : float list -> float
-  val mean_deviation : float list -> float
-  val permutations : float -> float -> float
-  val combinations : float -> float -> float
+  val permutations : float list-> float
+  val combinations : float list ->  float
   val factorial : float -> float
 end
 
 module Statistics_Functions : Statistics_Funcs = struct
 
   let mean (s : float list) =
-    Float.div (List.fold_left (fun acc x -> acc +. x) 0 s) (List.length s)
+    (List.fold_left (fun acc x -> acc +. x) 0. s) /. (float_of_int(List.length s))
 
   let median (s : float list) =
-    let len = List.length s in
-    ((List.nth s ((len-1)/2) + List.nth s (len/2))/. 2.)
+    let len = List.length s in 
+    let mid = List.nth s (len/2) in 
+    if (len mod 2<>0) then mid else 
+      let mid2 = List.nth s ((len-1)/2) in 
+      (mid+.mid2)/.2.
+
 
   let standard_deviation (s : float list) =
     let m = (mean s) in
     s |> List.map (fun x -> (x -. m) *. (x -. m)) |> mean |> Float.sqrt
 
-  let rec min (s : float list) =
+  let rec min_helper (s : float list) min_acc=
     match s with
-    | hd::[] -> hd
-    | hd::hd2::tl ->
-      if (hd > hd2) then min hd2::tl
-      else min hd1::tl
+    | [] -> min_acc
+    | h::t -> if (h<min_acc) then min_helper t h else min_helper t min_acc 
 
-  let max (s : float list) =
+  let min s = min_helper s max_float
+
+  let rec max_helper  (s : float list) max_acc=
     match s with
-    | hd::[] -> hd
-    | hd::hd2::tl ->
-      if (hd < hd2) then min hd2::tl
-      else hd1:: tl
+    | [] -> max_acc
+    | h::t -> if (h>max_acc) then max_helper t h else max_helper t max_acc
+
+  let max s = max_helper s min_float
 
   let range (s : float list) =
     ((max s) -. (min s))
 
-  let mean_deviation (s : float list) =
-  let m = (mean s) in
-  s |> List.map (fun x -> Float.abs (x -. m)) |> mean
-
   let rec factorial (n : float) =
     match n with
-    | 0 -> 1
-    | _ -> n *. (factorial (n -. 1))
+    | 0. -> 1.
+    | _ -> n *. (factorial (n -. 1.))
 
-  let permutations (n : float) (r : float) =
-    (factorial n) /. (factorial (n -. r))
+  let permutations nr =
+    match nr with
+    |[] -> failwith "wrong number of arguments"
+    |h1::[] -> failwith "wrong number of arguments"
+    |n::r::[] -> if (n<r) then failwith "First argument must be greater" 
+      else (factorial n) /. (factorial (n -. r))
+    |_ -> failwith "wrong number of arguments"
 
-  let combinations (n : float) (r : float) =
-    (factorial n) /. ((factorial (n -. r)) *. (factorial r))
+  let combinations nr =
+    match nr with
+    |[] -> failwith "wrong number of arguments"
+    |h1::[] -> failwith "wrong number of arguments"
+    |n::r::[] -> if (n<r) then failwith "First argument must be greater" else 
+        (factorial n) /. ((factorial (n -. r)) *. (factorial r))
+    |_ -> failwith "wrong number of arguments"
+
 end
 
-module type Statistics_CFU = struct
+module Statistics_CFU = struct
+  type primitive = float
+
+  let operation_list = [
+    ("mean", Statistics_Functions.mean);
+    ("median", Statistics_Functions.median);
+    ("stdev", Statistics_Functions.standard_deviation);
+    ("min", Statistics_Functions.min);
+    ("max", Statistics_Functions.max);
+    ("range", Statistics_Functions.range);
+    ("perm", Statistics_Functions.permutations);
+    ("comb", Statistics_Functions.combinations)
+  ]
+  let find_function (identifier : string) =
+    match List.assoc_opt identifier operation_list with
+    |Some f -> f
+    |None -> failwith (identifier^" is not a valid imported function")
+
+end
