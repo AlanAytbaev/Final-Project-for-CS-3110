@@ -6,6 +6,7 @@ open Environment
 open Lexing
 open Printf
 open Trigonometric
+open Statistics 
 
 module Env = Map.Make(String)
 type env = value Env.t
@@ -17,6 +18,10 @@ and value =
   |VBinop of string
   |VId of id
   |Closure of id list * expr * env 
+  |Extern of fun_ext
+
+and stats_type = float list -> float
+and fun_ext = ExtFun of stats_type
 
 and result = 
   |Result of value
@@ -43,6 +48,14 @@ let parse parser_start s =
 
 let parse_phrase = parse Parser.prog
 
+let return_head = function
+  |h::t -> h 
+  | _ -> failwith "This case is not reached"
+
+let rec helper_expr_to_float = function 
+  |[] -> []
+  |VFloat f:: t -> f:: helper_expr_to_float t 
+  | _ -> failwith "not right type of argument"
 
 (** [string_of_expr e] converts [e] to a string.
     Requires: [e] is an expression. *)
@@ -66,6 +79,7 @@ let string_of_value  = function
   |VBinop b -> "\"" ^ String.escaped b ^ "\""
   |VId x -> "\"" ^ String.escaped x ^ "\""
   |Closure (x, e, env) -> "<closure>"
+  |Extern e -> "<extern>"
 
 
 let load_file f env =
@@ -139,6 +153,8 @@ and eval_fun e1 e2 env =
         let env_for_body = add_bindings s v2 base_env in
         step env_for_body e
     end
+  |Extern (ExtFun f) ->  let v2 = eval_id_list e2 env  in 
+    VFloat (f (helper_expr_to_float v2))
   |_-> failwith "function failure"
 
 and eval_id_list e2 env = 
@@ -152,7 +168,6 @@ and add_bindings ids values env =
   | (id :: idt, v :: vt) -> let env' =  Env.add id (v) env in 
     add_bindings idt vt env'
   | _ -> env
-
 
 
 let eval_let_defn (env1:env) id e = 
@@ -200,4 +215,14 @@ let rec main () curr_env =
       print_endline "";
       main () env
 
-let () = main () (Env.empty)
+let initial_env =  Env.empty 
+                   |> Env.add "mean" (Extern (ExtFun (Statistics_CFU.find_function "mean")))
+                   |> Env.add "median" (Extern (ExtFun (Statistics_CFU.find_function "median"))) 
+                   |> Env.add "stdev" (Extern (ExtFun (Statistics_CFU.find_function "stdev"))) 
+                   |> Env.add "min" (Extern (ExtFun (Statistics_CFU.find_function "min"))) 
+                   |> Env.add "max" (Extern (ExtFun (Statistics_CFU.find_function "max")))
+                   |> Env.add "range" (Extern (ExtFun (Statistics_CFU.find_function "range")))
+                   |> Env.add "perm" (Extern (ExtFun (Statistics_CFU.find_function "perm")))
+                   |> Env.add "comb" (Extern (ExtFun (Statistics_CFU.find_function "comb")))
+
+let () = main () (initial_env)
