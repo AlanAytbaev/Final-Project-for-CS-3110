@@ -7,4 +7,6 @@ Functions that can be preformed:
 - if then else statements where guard evaluates to a boolean or 1 -> true, 0 -> false
 - let definitions (let <variable name> = <value> )
 - let expressions ( let <variable name> = <value> in <expression body> )
-
+- statistics (mean [number list] ; median[number list]; 
+  max[number list]; min[number list]; stdev[number list])
+- graphing (let func_name = fun (x) -> x*x and graph func_name ) 
