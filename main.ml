@@ -6,7 +6,8 @@ open Environment
 open Lexing
 open Printf
 open Trigonometric
-open Statistics 
+open Statistics
+open Graphing
 
 module Env = Map.Make(String)
 type env = value Env.t
@@ -21,7 +22,11 @@ and value =
   |Extern of fun_ext
 
 and stats_type = float list -> float
-and fun_ext = ExtFun of stats_type
+and graph_type = value * env -> Ast.expr
+
+and fun_ext = 
+  | ExtFun of stats_type
+  | GExtFun of graph_type
 
 and result = 
   |Result of value
@@ -147,14 +152,20 @@ and eval_fun e1 e2 env =
   match v' with 
   |Closure( s, e, env') -> begin 
       let v2 = eval_id_list e2 env in 
-      if (List.length s <> List.length v2) then failwith "wrong number of arguments" 
+      if (List.length s <> List.length v2)
+      then 
+        failwith "wrong number of arguments" 
       else
         let base_env = env' in 
         let env_for_body = add_bindings s v2 base_env in
         step env_for_body e
     end
-  |Extern (ExtFun f) ->  let v2 = eval_id_list e2 env  in 
+  |Extern (ExtFun f) ->  
+    let v2 = eval_id_list e2 env  in 
     VFloat (f (helper_expr_to_float v2))
+  |Extern (GExtFun g) -> 
+    let v2 = step env (List.hd e2) in
+    step env (g (v2, env))
   |_-> failwith "function failure"
 
 and eval_id_list e2 env = 
@@ -197,6 +208,27 @@ let interp (s : string) (curr_env: env) : (string * env) =
   with
   |SyntaxError s |Failure s -> (s, curr_env)
 
+let unwrap_float f = 
+  match f with
+  | VFloat e -> e
+  | _ -> failwith "This cannot happen main.ml : unwrap_float"
+
+let graph (c, env) = 
+  let (ids, f, env') = 
+    match c with
+    | Closure (ids, f , env') -> (ids, f, env')
+    | _ -> failwith "Cannot graph a non-closure main.ml : graph"
+  in
+  let out_file = "data.dat" in
+  let out_handle = open_out out_file in 
+  for x=(-100) to 100 do
+    let y = step env 
+        (FunApp (Fun (["x"], f), [(Float ((Float.of_int (x)) /. 10.))])) in 
+    fprintf out_handle "%d %f\n" x (y |> unwrap_float)
+  done;
+  close_out out_handle;
+  let _ = Sys.command "gnuplot -c gnuplot_script.txt" in 
+  Boolean true
 
 
 let rec help_command_helper chnl =
@@ -224,5 +256,6 @@ let initial_env =  Env.empty
                    |> Env.add "range" (Extern (ExtFun (Statistics_CFU.find_function "range")))
                    |> Env.add "perm" (Extern (ExtFun (Statistics_CFU.find_function "perm")))
                    |> Env.add "comb" (Extern (ExtFun (Statistics_CFU.find_function "comb")))
+                   |> Env.add "graph" (Extern (GExtFun (graph)))
 
 let () = main () (initial_env)
