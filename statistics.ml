@@ -22,10 +22,11 @@ module Statistics_Functions : Statistics_Funcs = struct
     (List.fold_left (fun acc x -> acc +. x) 0. s) /. (float_of_int(List.length s))
 
   let median (s : float list) =
-    let len = List.length s in 
-    let mid = List.nth s (len/2) in 
+    let s_new = List.sort compare s  in 
+    let len = List.length s_new in 
+    let mid = List.nth s_new (len/2) in 
     if (len mod 2<>0) then mid else 
-      let mid2 = List.nth s ((len-1)/2) in 
+      let mid2 = List.nth s_new ((len-1)/2) in 
       (mid+.mid2)/.2.
 
 
