@@ -1,6 +1,30 @@
 
-type id = string
-type bop =
+module Env = Map.Make (String)
+
+type env = value Env.t
+
+and value =
+  |VBool of bool
+  |VFloat of float
+  |VString of string
+  |VBinop of string
+  |VId of id
+  |Closure of id list * expr * env 
+  |Extern of fun_ext
+
+and stats_type = float list -> float
+and graph_type = value * env -> expr
+
+and fun_ext = 
+  | ExtFun of stats_type
+  | GExtFun of graph_type
+
+and result = 
+  |Result of value
+and
+  id = string
+and
+  bop =
   |Add
   |Mult
   |Subt
@@ -10,8 +34,8 @@ type bop =
   |Log
   |Equals
   |Func of string
-
-type unop = 
+and 
+  unop = 
   |Sin 
   |Cos 
   |Tan 
@@ -20,9 +44,6 @@ type unop =
   |Cot
   |Func_u of string
 
-module Env = Map.Make (String)
-
-type env = expr Env.t
 and expr =
   |Boolean of bool
   |Var of id

@@ -1,3 +1,5 @@
+open Ast
+
 (** A module that implements the functions needed for the arithmetic cfu.
     A module that matches [Arithmetic_Funcs] is suitable for use in
     [Arithmetic_CFU]. *)

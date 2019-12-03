@@ -1,4 +1,4 @@
-MODULES=lexer parser arithmetic main
+MODULES=lexer parser arithmetic main test calc
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
@@ -18,8 +18,8 @@ test:
 
 clean:
 	ocamlbuild -clean
-
+	
 calc:
-	$(OCAMLBUILD) main.byte && ./main.byte
+	$(OCAMLBUILD) calc.byte && ./calc.byte
 zip:
 	zip calculator.zip *.ml* _tags Makefile INSTALL.txt README.txt
