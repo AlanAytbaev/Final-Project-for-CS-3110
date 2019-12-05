@@ -4,57 +4,71 @@ open Ast
     A module that matches [Arithmetic_Funcs] is suitable for use in
     [Arithmetic_CFU]. *)
 module type Arithmetic_Funcs = sig
-  val add2 : float list -> float
-  val subtract : float list -> float
-  val multiply : float list -> float
-  val divide : float list -> float
-  val exponentiation : float list -> float
-  val modulus : float list -> float
-  val logarithm : float list -> float
-  val equal_to : float list -> float
+  val add2 : value list -> value
+  val subtract : value list -> value
+  val multiply : value list -> value
+  val divide : value list -> value
+  val exponentiation : value list -> value
+  val modulus : value list -> value
+  val logarithm : value list -> value
+  val equal_to : value list -> value
 end
 
 module type CFU_sig = sig
-  (** type primitive is the type of the value that the calculator works with*)
-  type primitive
   (** An [operation_list] is an association list that maps operation symbols
       to functions *)
-  val operation_list : (string * ( primitive list -> primitive )) list
+  val operation_list : (string * ( value list -> value )) list
   (** [find s] is the operation that is associated with [s] in the operation
       list *)
-  val find_function : string -> (float list -> float)
+  val find_function : string -> (value list -> value)
 end
 
 module Arithmetic_Functions : Arithmetic_Funcs = struct
+  let unwrap v =
+    match v with
+    | VFloat x -> x
+    | _ -> failwith "This cannot occur - arithmetic.ml"
 
-  let add2 (s : float list) =
+  let add2 (s : value list) =
     match s with
-    | hd1::hd2::tl -> (Float.add hd1 hd2)
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (Float.add hd1' hd2')
     | _ -> failwith "InvalidInput"
 
-  let subtract (s : float list) =
+  let subtract (s : value list) =
     match s with
-    | hd1::hd2::tl -> (Float.sub hd1 hd2)
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (Float.sub hd1' hd2')
     | _ -> failwith "InvalidInput"
 
-  let multiply (s : float list) =
+  let multiply (s : value list) =
     match s with
-    | hd1::hd2::tl -> (Float.mul hd1 hd2)
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (Float.mul hd1' hd2')
     | _ -> failwith "InvalidInput"
 
-  let divide (s : float list) =
+  let divide (s : value list) =
     match s with
-    | hd1::hd2::tl -> (Float.div hd1 hd2)
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (Float.div hd1' hd2')
     | _ -> failwith "InvalidInput"
 
-  let exponentiation (s : float list) =
+  let exponentiation (s : value list) =
     match s with
-    | hd1::hd2::tl -> (hd1 ** hd2)
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (hd1' ** hd2')
     | _ -> failwith "InvalidInput"
 
-  let modulus (s : float list) =
+  let modulus (s : value list) =
     match s with
-    | hd1::hd2::tl ->  Stdlib.mod_float hd1 hd2
+    | hd1::hd2::tl ->  
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (Stdlib.mod_float hd1' hd2')
     | _ -> failwith "InvalidInput"
 
   let rec log (a : float) (b : float) =
@@ -63,20 +77,22 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
     | _ when n < 0 -> a
     | _ -> 1.0 +. log (Float.div a b) b
 
-  let logarithm (s : float list) =
+  let logarithm (s : value list) =
     match s with
-    | hd1::hd2::tl -> log hd1 hd2
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (log hd1' hd2')
     | _ -> failwith "InvalidInput"
 
-  let equal_to (s : float list) =
+  let equal_to (s : value list) =
     match s with
-    | hd1::hd2::tl -> (if (hd1 = hd2) then 1.0 else 0.0)
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
+      VFloat (if (hd1' = hd2') then 1.0 else 0.0)
     | _ -> failwith "InvalidInput"
 end
 
 module Arithmetic_CFU : CFU_sig = struct
-
-  type primitive = float
 
   let operation_list = [
     ("+", Arithmetic_Functions.add2);

@@ -8,6 +8,7 @@ open Printf
 open Trigonometric
 open Statistics
 open Graphing
+open Imports
 
 module type Main_Sig = sig
   val interp : string -> env -> (string * env)
@@ -15,6 +16,7 @@ module type Main_Sig = sig
 end
 
 module Main = struct
+
   (**Exceptions *)
   exception SyntaxError of string
   exception UnexpectedError of string
@@ -69,7 +71,6 @@ module Main = struct
     |Closure (x, e, env) -> "<closure>"
     |Extern e -> "<extern>"
 
-
   let load_file f env =
     let ic = open_in f in
     let n = in_channel_length ic in
@@ -97,7 +98,7 @@ module Main = struct
   and eval_unop uop e env = 
     let v = step env e in 
     match uop, v with 
-    |Func_u str, VFloat a -> VFloat (((Trigonometric_CFU.find_function str) [a]))
+    |Func_u str, v1 -> (Imports.find_function str) [v1]
     |_ -> failwith "precondition violated"
 
   and eval_if e1 e2 e3 env = 
@@ -112,10 +113,10 @@ module Main = struct
       [v1 bop v2].  Requires: [v1] and [v2] are both values. *)
   and step_bop bop e1 e2 env = 
     let e1' = step env e1 in 
-    let e2' = step env e2 in 
+    let e2' = step env e2 in
     match bop, e1', e2' with
-    | Func str, VFloat a, VFloat b ->
-      (VFloat (((Arithmetic_CFU.find_function str) [a;b])))
+    | Func str, v1, v2 ->
+      (Imports.find_function str) [v1;v2]
     | _ -> failwith "precondition violated - step bop"
 
   and string_of_var e = match e with 
