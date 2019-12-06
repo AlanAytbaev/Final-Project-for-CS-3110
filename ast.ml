@@ -12,17 +12,20 @@ and value =
   |Closure of id list * expr * env 
   |Extern of fun_ext
 
-and stats_type = float list -> float
-and graph_type = value * env -> expr
+and graph_type = value * value * value * env -> expr
+
+and ext_type = value list -> value
 
 and fun_ext = 
-  | ExtFun of stats_type
+  | ExtFun of ext_type
   | GExtFun of graph_type
 
 and result = 
   |Result of value
+
 and
   id = string
+
 and
   bop =
   |Add
@@ -35,12 +38,13 @@ and
   |Equals
   |Func of string
 and 
+
   unop = 
   |Sin 
   |Cos 
   |Tan 
   |Sec 
-  |Csc 
+  |Csc
   |Cot
   |Func_u of string
 
@@ -55,7 +59,6 @@ and expr =
   |Let of id * expr * expr
   |Fun of string list * expr
   |FunApp of expr * expr list
-
 
 and defn = 
   |DLet of string * expr

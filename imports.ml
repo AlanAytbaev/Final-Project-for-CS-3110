@@ -1,7 +1,6 @@
 open Arithmetic
 open Trigonometric
 open Statistics
-open Graphing
 open Ast
 
 module type Imports_Sig = sig
@@ -20,7 +19,7 @@ module Imports = struct
     | h::t -> combine_lists t (List.append acc h)
     | [] -> acc
 
-  let cfu_list = [arith;trig]
+  let cfu_list = [arith;trig;]
 
   let operation_list = combine_lists cfu_list []
 

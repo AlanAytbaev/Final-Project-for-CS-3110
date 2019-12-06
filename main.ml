@@ -7,7 +7,6 @@ open Lexing
 open Printf
 open Trigonometric
 open Statistics
-open Graphing
 open Imports
 
 module type Main_Sig = sig
@@ -79,6 +78,10 @@ module Main = struct
     close_in ic;
     (Bytes.unsafe_to_string s)
 
+  let unwrap_float v =
+    match v with
+    | VFloat x -> x
+    | _ -> failwith "This cannot occur - arithmetic.ml"
 
   let rec step (curr_env:env) expr = 
     match expr with 
@@ -144,10 +147,10 @@ module Main = struct
       end
     |Extern (ExtFun f) ->  
       let v2 = eval_id_list e2 env  in 
-      VFloat (f (helper_expr_to_float v2))
+      (f v2)
     |Extern (GExtFun g) -> 
-      let v2 = step env (List.hd e2) in
-      step env (g (v2, env))
+      let v2 = (eval_id_list e2 env) in
+      step env (g (List.nth v2 0 , List.nth v2 1, List.nth v2 2, env))
     |_-> failwith "function failure"
 
   and eval_id_list e2 env = 
@@ -161,7 +164,6 @@ module Main = struct
     | (id :: idt, v :: vt) -> let env' =  Env.add id (v) env in 
       add_bindings idt vt env'
     | _ -> env
-
 
   let eval_let_defn (env1:env) id e = 
     let v = step env1 e  in
@@ -180,7 +182,6 @@ module Main = struct
 
   (** [interp s] interprets [s] by parsing and evaluating it. *)
   let interp (s : string) (curr_env: env) : (string * env) =
-    print_endline "INTERP";
     try (
       let expr = s |> parse_phrase |> eval_phrase curr_env in 
       let v' = fst expr in 
@@ -190,29 +191,6 @@ module Main = struct
     )
     with
     |SyntaxError s |Failure s -> (s, curr_env)
-
-  let unwrap_float f = 
-    match f with
-    | VFloat e -> e
-    | _ -> failwith "This cannot happen main.ml : unwrap_float"
-
-  let graph (c, env) = 
-    let (ids, f, env') = 
-      match c with
-      | Closure (ids, f , env') -> (ids, f, env')
-      | _ -> failwith "Cannot graph a non-closure main.ml : graph"
-    in
-    let out_file = "data.dat" in
-    let out_handle = open_out out_file in 
-    for x=(-100) to 100 do
-      let y = step env 
-          (FunApp (Fun (["x"], f), [(Float ((Float.of_int (x))))])) in 
-      fprintf out_handle "%d %f\n" x (y |> unwrap_float)
-    done;
-    close_out out_handle;
-    let _ = Sys.command "gnuplot -c gnuplot_script.txt" in 
-    Boolean true
-
 
   let rec help_command_helper chnl =
     match input_line chnl with
@@ -230,19 +208,97 @@ module Main = struct
         print_endline "";
         main () env
 
+  (**BEGIN Externs *)
+  let graph (c, left_bound, right_bound, env) = 
+    let (ids, f, env') = 
+      match c with
+      | Closure (ids, f , env') -> (ids, f, env')
+      | _ -> failwith "Cannot graph a non-closure main.ml : graph"
+    in
+    let out_file = "data.dat" in
+    let out_handle = open_out out_file in 
+    let left_int = (left_bound |> unwrap_float |> int_of_float)*100 in
+    let right_int = (right_bound |> unwrap_float |> int_of_float)*100 in 
+    for x=left_int to right_int do
+      try 
+        let y = 
+          step 
+            env 
+            (FunApp (Fun (["x"], f), [Float (Float.of_int (x / 100))]))
+        in
+        fprintf out_handle "%d %f\n" (x/100) (y |> unwrap_float)
+      with
+      | e -> ()
+    done;
+    close_out out_handle;
+    let _ = Sys.command "gnuplot -c gnuplot_script.txt" in 
+    Boolean true
+
+  let derivative_helper (c : value) (x1_val : value) (h_val : value) =
+    let (ids, expr, env) = 
+      match c with
+      | Closure (ids, expr , env') -> (ids, expr, env')
+      | _ -> failwith "Cannot graph a non-closure main.ml : graph"
+    in
+    let f = (Fun (["x"], expr)) in
+    let x1 = x1_val |> unwrap_float in
+    let h = h_val |> unwrap_float in 
+    let y1 = step env (FunApp (f,[Float x1])) |> unwrap_float in
+    let x2 = Float.add x1 h in 
+    let y2 = step env (FunApp (f,[Float x2])) |> unwrap_float in
+    (Float.div (Float.sub y2 y1) (h_val |> unwrap_float ))
+
+  let derivative (v : value list) = 
+    let c = List.nth v 0 in 
+    let x1_val = List.nth v 1 in 
+    let h_val = List.nth v 2 in
+    VFloat (derivative_helper c x1_val h_val)
+
+  let trapezoid (c : value) (v : float) (v1 : float) =
+    let (ids, expr, env) = 
+      match c with
+      | Closure (ids, expr , env') -> (ids, expr, env')
+      | _ -> failwith "Cannot graph a non-closure main.ml : graph"
+    in
+    let f = (Fun (["x"], expr)) in
+    let left_height = step env (FunApp (f,[Float v])) |> unwrap_float in
+    let right_height = step env (FunApp (f, [Float v1])) |> unwrap_float in 
+    Float.mul
+      (Float.mul 0.5 (Float.add (left_height) (right_height))) 
+      (Float.sub v1 v)
+
+  let rec integrate_helper 
+      (f : value) (v : float) (v1 : float) (acc : float) =
+    if v > (v1 -. 0.09) && v < (v1 +. 0.09) then
+      acc 
+    else if v < v1 then
+      integrate_helper 
+        f 
+        (Float.add v 0.1) 
+        v1 
+        (Float.add acc (trapezoid f v (Float.add v 0.1)))
+    else 
+      integrate_helper 
+        f 
+        (Float.add v (- 0.1) )
+        v1 
+        (Float.add acc (trapezoid f v (Float.add v (- 0.1))))
+
+  let integrate (v : value list) = 
+    VFloat (integrate_helper 
+              (List.nth v 0) 
+              (List.nth v 1 |> unwrap_float) 
+              (List.nth v 2 |> unwrap_float)
+              (0.0))
+
+  (**END Externs *)
+
   let initial_env =  
     Env.empty 
-    |> Env.add "mean" (Extern (ExtFun (Statistics_CFU.find_function "mean")))
-    |> Env.add "median" (Extern (ExtFun (Statistics_CFU.find_function "median"))) 
-    |> Env.add "stdev" (Extern (ExtFun (Statistics_CFU.find_function "stdev"))) 
-    |> Env.add "min" (Extern (ExtFun (Statistics_CFU.find_function "min"))) 
-    |> Env.add "max" (Extern (ExtFun (Statistics_CFU.find_function "max")))
-    |> Env.add "range" (Extern (ExtFun (Statistics_CFU.find_function "range")))
-    |> Env.add "perm" (Extern (ExtFun (Statistics_CFU.find_function "perm")))
-    |> Env.add "comb" (Extern (ExtFun (Statistics_CFU.find_function "comb")))
     |> Env.add "graph" (Extern (GExtFun (graph)))
+    |> Env.add "deriv" (Extern (ExtFun (derivative)))
+    |> Env.add "integ" (Extern (ExtFun (integrate)))
 
   let run = fun () ->
     main () (initial_env)
 end
-
