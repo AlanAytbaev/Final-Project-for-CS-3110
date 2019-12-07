@@ -2,26 +2,37 @@ open Arithmetic
 open Trigonometric
 open Statistics
 open Ast
+open Matrix
+open Set
 
 module type Imports_Sig = sig
   (** [find s] is the operation that is associated with [s] in the operation
       list *)
   val find_function : string -> (value list -> value)
+  val functions_map : env
 end
 
 module Imports = struct
   let stats = Statistics_CFU.operation_list
   let arith = Arithmetic_CFU.operation_list
   let trig = Trigonometric_CFU.operation_list
+  let matrix = Matrix_CFU.operation_list
+  let set = Set_CFU.operation_list
 
-  let rec combine_lists lists acc =
-    match lists with
-    | h::t -> combine_lists t (List.append acc h)
+  let cfu_list = [arith;trig;matrix;set]
+
+  let operation_list = List.append cfu_list [] |> List.flatten
+
+  let rec map_of_functions operations acc = 
+    match operations with
     | [] -> acc
+    | h::t ->
+      let name = fst h in 
+      let f = snd h in
+      let env' = Env.add name (Extern (ExtFun f)) acc in
+      map_of_functions t env'
 
-  let cfu_list = [arith;trig;]
-
-  let operation_list = combine_lists cfu_list []
+  let functions_map = map_of_functions operation_list Env.empty
 
   let find_function (identifier : string) =
     match List.assoc_opt identifier operation_list with

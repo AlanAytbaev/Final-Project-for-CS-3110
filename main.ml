@@ -46,6 +46,34 @@ module Main = struct
     |VFloat f:: t -> f:: helper_expr_to_float t 
     | _ -> failwith "not right type of argument"
 
+  (** [helper_expr_to_float lst] is the float list representation
+      of [lst] is all values of [lst] are floats *)
+  let rec values_to_floats = function 
+    |[] -> []
+    |VFloat f :: t -> f :: values_to_floats t 
+    | _ -> failwith "not right type of argument"
+
+  (** TODO: DOCUMENT *)
+  let rec string_of_floatlst lst = 
+    match lst with 
+    |[] -> ""
+    |h :: t -> if t = [] then 
+        string_of_float h ^"" ^ string_of_floatlst t else 
+        string_of_float h ^", " ^ string_of_floatlst t
+
+  (** TODO: DOCUMENT *)
+  let rec matrix_to_string_helper lsts fst_element= 
+    match lsts with 
+    |[] -> ""
+    |h::t -> if (h == fst_element) then
+        "|"^ string_of_floatlst h ^"|" ^ matrix_to_string_helper t fst_element else 
+        "\n |"^ string_of_floatlst h ^"|" ^ matrix_to_string_helper t fst_element
+
+  (** TODO: DOCUMENT *)
+  let matrix_to_string m = 
+    let lst = Array.to_list (Array.map Array.to_list m) in 
+    let s = "["^ (matrix_to_string_helper lst (List.nth lst 0))^ "]"in s
+
   (** [string_of_expr e] converts [e] to a string.
       Requires: [e] is an expression. *)
   let string_of_expr e =
@@ -69,6 +97,11 @@ module Main = struct
     |VId x -> "\"" ^ String.escaped x ^ "\""
     |Closure (x, e, env) -> "<closure>"
     |Extern e -> "<extern>"
+    |VRow r -> 
+      let s = Array.fold_left (fun acc s -> acc^ " " ^ (string_of_float s)) "" r 
+      in "["^s^"]"
+    |VFloatList _ -> "float list values"
+    |VMatrix m -> matrix_to_string m
 
   let load_file f env =
     let ic = open_in f in
@@ -158,6 +191,12 @@ module Main = struct
     |[] -> []
     |e :: t -> (step env e ):: (eval_id_list t env)
 
+  (** TODO: DOCUMENT *)
+  and eval_id_list_floats e2 env = 
+    match e2 with
+    |[] -> []
+    |e :: t -> (step env (e )):: (eval_id_list_floats (t) env)
+
   and add_bindings ids values env = 
     match (ids, values) with 
     | ([], []) -> env
@@ -165,14 +204,89 @@ module Main = struct
       add_bindings idt vt env'
     | _ -> env
 
+  (** TODO: DOCUMENT *)
+  let rec eval_row_id_list lst env = 
+    match lst with 
+    |[] -> []
+    |h :: t -> let h = Var h in (step env h) :: (eval_row_id_list t env)
+
+  (** TODO: DOCUMENT *)
+  let array_getter e = 
+    match e with 
+    |VRow e -> e
+    |_ -> failwith "wrong type of arguement"
+
+  (** TODO: DOCUMENT *)
+  let rec array_updater lst array acc = 
+    match lst with 
+    |[] -> array
+    |h :: t -> let ar = array_getter h in 
+      let () = array.(acc) <- ar in array_updater t array (acc+1)
+
+  (** TODO: DOCUMENT *)
+  let eval_mlet_defn id e env = 
+    let lst_of_arrays = eval_row_id_list e env in 
+    let column_length = List.nth lst_of_arrays 0 
+                        |> array_getter 
+                        |> Array.length in 
+    let array = Array.make_matrix  (List.length e) column_length 0. in 
+    let array' = VMatrix (array_updater lst_of_arrays array 0) in 
+    let env' = Env.add id array' env in 
+    (array', env')
+
+  (** TODO: DOCUMENT *)
+  let eval_mrow x lst curr_env = 
+    let a = eval_id_list lst curr_env in
+    let a' = values_to_floats a in  
+    let array = Array.make (List.length a') 0. in 
+    let () = for i = 0 to ((List.length a') - 1) do
+        array.(i) <- List.nth a' i
+      done in
+    let env = Env.add x (VRow array) curr_env in 
+    (VRow array, env)
+
+  (** TODO: DOCUMENT *)
+  let eval_mlet_defn id e env = 
+    let lst_of_arrays = eval_row_id_list e env in 
+    let column_length = List.nth lst_of_arrays 0 
+                        |> array_getter 
+                        |> Array.length in 
+    let array = Array.make_matrix  (List.length e) column_length 0. in 
+    let array' = VMatrix (array_updater lst_of_arrays array 0) in 
+    let env' = Env.add id array' env in 
+    (array', env')
+
   let eval_let_defn (env1:env) id e = 
     let v = step env1 e  in
     let env' = Env.add id v env1 in
     (v, env')
 
+  (** TODO: DOCUMENT *)
+  let float_getter v = 
+    match v with 
+    |VFloat v -> v 
+    |_ -> failwith "invalid argument"
+
+  (** TODO: DOCUMENT  - duplicate function??? *)
+  let rec eval_id_lst_flts lst env = 
+    match lst with
+    |[] -> []
+    |e :: t -> ( float_getter (step env e)) :: (eval_id_lst_flts t env)
+
+  (** TODO: DOCUMENT *)
+  let eval_slet id e env = 
+    let vlst = (VFloatList (eval_id_lst_flts e env)) in 
+    let env' = Env.add id vlst env in 
+    (vlst, env')
+
+  (** [eval_defn env e] is the (v, env') where [v] is such that
+      [<env, e> ==> <v, env'>]. *)
   let eval_defn env e =
     match e with
+    |MRow (id, e) -> eval_mrow id e env
     |DLet (id, e1) -> eval_let_defn env id e1
+    |MLet (id, e) -> eval_mlet_defn id e env
+    |SLet (id, e) -> eval_slet id e env 
 
   let rec eval_phrase env exp =
     match exp with
@@ -294,10 +408,33 @@ module Main = struct
   (**END Externs *)
 
   let initial_env =  
-    Env.empty 
-    |> Env.add "graph" (Extern (GExtFun (graph)))
-    |> Env.add "deriv" (Extern (ExtFun (derivative)))
-    |> Env.add "integ" (Extern (ExtFun (integrate)))
+
+    Env.merge 
+      (fun key a b -> 
+         match (a, b) with 
+         | (Some _, Some _) -> failwith "You have conflicting imports"
+         | (Some _, None) -> a
+         | (None, Some _) -> b
+         | (None, None) -> failwith "This cannot happen"
+      )
+      Imports.functions_map
+      (Env.empty 
+       |> Env.add "graph" (Extern (GExtFun (graph)))
+       |> Env.add "deriv" (Extern (ExtFun (derivative)))
+       |> Env.add "integ" (Extern (ExtFun (integrate)))
+    (*
+    |> Env.add "madd" 
+      (Extern (ExtFun (Imports.find_function "add")))
+    |> Env.add "msub" 
+      (Extern (MExtFun (Matrix_CFU.find_function "sub")))
+    |> Env.add "intersect"
+      (Extern (SExtFun (MySet_CFU.find_function "intersect")))
+    |> Env.add "difference"
+      (Extern (SExtFun (MySet_CFU.find_function "difference")))
+    |> Env.add "union"
+      (Extern (SExtFun (MySet_CFU.find_function "union")))
+       *)
+       |> Env.add "pi" (VFloat 3.14))
 
   let run = fun () ->
     main () (initial_env)

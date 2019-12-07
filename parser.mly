@@ -7,9 +7,9 @@ open List
 %token <float> FLT
 %token <string> ID STRING
 %token ADD MULT LOG MOD EXP SUBT DIV EQUALS
-%token LPAREN RPAREN ARROW SEMI
+%token LPAREN RPAREN ARROW SEMI DOUBLE_SEMI RBRACK LBRACK
 %token TRUE FALSE
-%token FUN IN LET IF THEN ELSE 
+%token FUN IN LET IF THEN ELSE RLET MLET SLET
 %token EOF
 %token SIN
 %token COS
@@ -50,6 +50,8 @@ seq_expr:
 
 expr:
 |e = s_expr { e }
+/* |e = rm_expr { e } */
+/* |e = m_expr { e } */
 |e = s_expr; es = nonempty_list(s_expr) { FunApp (e, es) }
 |e1 = expr; ADD; e2 = expr { Binop (Func "+", e1, e2) }
 |e1 = expr; SUBT; e2 = expr { Binop (Func "-", e1, e2) }
@@ -75,15 +77,29 @@ s_expr:
 | s = FLT { Float s }
 | LPAREN; e = seq_expr; RPAREN
         { e }
+/* | LBRACK; e = nonempty_list(s_expr); RBRACK; SEMI 
+        { e } */
 | s = STRING { String s }
 | b = BOOL { Boolean b }
 | TRUE { Boolean true }
 | FALSE { Boolean false }
 
+/* rm_expr:
+|x = ID; EQUALS; r = nonempty_list(num); SEMI; { MRow (x, r) }  */
+
+/* m_expr:
+|m = nonempty_list(rm_expr); DOUBLE_SEMI; { MFun m } */
 
 defn:
 |LET; x = ID; EQUALS; e1 = expr { DLet (x, e1) }
+|SLET; x = ID; EQUALS; LBRACK; e = nonempty_list(s_expr); RBRACK; SEMI { MRow (x, e) }
+|RLET; x = ID; EQUALS; LBRACK; e = nonempty_list(s_expr); RBRACK; SEMI { MRow (x, e) }
+|MLET; x = ID; EQUALS; e = nonempty_list(iden); SEMI { MLet (x, e) }
 
 iden:
   | x = ID
         { x }
+
+num:
+|x = FLT 
+      { Float x }

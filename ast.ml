@@ -11,6 +11,13 @@ and value =
   |VId of id
   |Closure of id list * expr * env 
   |Extern of fun_ext
+  |VMatrix of float array array
+  |VFloatList of float list
+  |VRow of float array
+
+and matrix_type = float array array -> float array array -> float array array 
+
+and set_type = float array -> float array  -> float array
 
 and graph_type = value * value * value * env -> expr
 
@@ -19,6 +26,7 @@ and ext_type = value list -> value
 and fun_ext = 
   | ExtFun of ext_type
   | GExtFun of graph_type
+  | MExtFun of matrix_type
 
 and result = 
   |Result of value
@@ -28,24 +36,10 @@ and
 
 and
   bop =
-  |Add
-  |Mult
-  |Subt
-  |Div
-  |Exp
-  |Mod
-  |Log
-  |Equals
   |Func of string
 and 
 
   unop = 
-  |Sin 
-  |Cos 
-  |Tan 
-  |Sec 
-  |Csc
-  |Cot
   |Func_u of string
 
 and expr =
@@ -62,6 +56,9 @@ and expr =
 
 and defn = 
   |DLet of string * expr
+  |MRow of string * expr list
+  |MLet of string * id list
+  |SLet of string * expr list
 
 and phrase = 
   | Expr of expr

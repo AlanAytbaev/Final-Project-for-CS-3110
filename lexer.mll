@@ -35,16 +35,22 @@ parse
 |"cot" { COT }
 |"==" { EQUALS }
 |";" { SEMI }
+|";;" {DOUBLE_SEMI}
 |"if" { IF }
 |"then" { THEN }
 |"else" { ELSE }
 |"let" { LET }
+|"rlet" { RLET }
+|"mlet" { MLET }
+|"slet" { SLET }
 |"=" { EQUALS }
 |"in" { IN }
 |"fun" {FUN}
 |"->" {ARROW}
 |"(" {LPAREN}
 |")" {RPAREN}
+|"[" {LBRACK}
+|"]" {RBRACK}
 |id { ID (Lexing.lexeme lexbuf) }
 |float { FLT (float_of_string (Lexing.lexeme lexbuf)) }
 |eof { EOF }
