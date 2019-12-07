@@ -422,18 +422,6 @@ module Main = struct
        |> Env.add "graph" (Extern (GExtFun (graph)))
        |> Env.add "deriv" (Extern (ExtFun (derivative)))
        |> Env.add "integ" (Extern (ExtFun (integrate)))
-    (*
-    |> Env.add "madd" 
-      (Extern (ExtFun (Imports.find_function "add")))
-    |> Env.add "msub" 
-      (Extern (MExtFun (Matrix_CFU.find_function "sub")))
-    |> Env.add "intersect"
-      (Extern (SExtFun (MySet_CFU.find_function "intersect")))
-    |> Env.add "difference"
-      (Extern (SExtFun (MySet_CFU.find_function "difference")))
-    |> Env.add "union"
-      (Extern (SExtFun (MySet_CFU.find_function "union")))
-       *)
        |> Env.add "pi" (VFloat 3.14))
 
   let run = fun () ->

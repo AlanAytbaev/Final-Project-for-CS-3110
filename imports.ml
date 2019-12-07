@@ -4,6 +4,7 @@ open Statistics
 open Ast
 open Matrix
 open Set
+open Fibonacci
 
 module type Imports_Sig = sig
   (** [find s] is the operation that is associated with [s] in the operation
@@ -18,8 +19,9 @@ module Imports = struct
   let trig = Trigonometric_CFU.operation_list
   let matrix = Matrix_CFU.operation_list
   let set = Set_CFU.operation_list
+  let fib = Fib_CFU.operation_list
 
-  let cfu_list = [arith;trig;matrix;set]
+  let cfu_list = [arith;trig;matrix;set;fib]
 
   let operation_list = List.append cfu_list [] |> List.flatten
 
