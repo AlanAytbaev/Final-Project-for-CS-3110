@@ -16,6 +16,8 @@ module type Matrix_Funcs = sig
 
   val dot_product_matrix : value list -> value
 
+  val echelon_form : value list -> value 
+
 end
 
 module Matrix_Functions : Matrix_Funcs = struct
@@ -111,7 +113,44 @@ module Matrix_Functions : Matrix_Funcs = struct
     let x2 = List.nth v 0 |> unwrap_matrix in
     VMatrix (dot_product_matrix_helper x1 x2)
 
-
+  let echelon_form_helper x1 = 
+    let row_num = (Array.length x1) -1 in
+    let col_num = (Array.length (Array.get x1 0))-1 in
+    let () = 
+      for i = 0 to row_num do 
+        for r = i+1 to row_num do 
+          let factor = x1.(r).(i) /. x1.(i).(i) in 
+          for c = i to col_num do
+            x1.(r).(c) <- (x1.(r).(c) -. x1.(i).(c)*.factor);
+          done;
+          for c = i to col_num do
+            if x1.(r).(i) > 0.1 || x1.(r).(i) < -0.1 then 
+              x1.(r).(c) <- (x1.(r).(c) /. x1.(r).(i))
+            else ()
+          done ;
+        done ;
+      done in 
+    x1 
+(*
+  let echelon_form_helper x1 = 
+    let row_num = Array.length x1 in 
+    let col_num = Array.length (Array.get x1 0) in
+    let () = for i = 0 to row_num-1 do 
+        for r = i+1 to row_num-1 do 
+          let factor = x1.(i).(i) /. x1.(r).(i) in 
+          for c = i to col_num-1 do 
+            x1.(r).(c) <- (x1.(r).(c)*.factor) -. x1.(i).(c) 
+          done ;
+          for c = i to col_num-1 do 
+            x1.(r).(c) <- x1.(r).(c) /. x1.(r).(i) 
+          done 
+        done 
+      done in 
+    x1 
+*)
+  let echelon_form v = 
+    let x1 = List.nth v 0 |> unwrap_matrix in
+    VMatrix (echelon_form_helper x1 )
 end
 
 module Matrix_CFU : CFU_sig = struct
@@ -119,6 +158,7 @@ module Matrix_CFU : CFU_sig = struct
     ("madd", Matrix_Functions.add_matrix);
     ("msub", Matrix_Functions.sub_matrix);
     ("mdot", Matrix_Functions.dot_product_matrix);
+    ("echelon", Matrix_Functions.echelon_form);
   ]
 
 end
