@@ -9,7 +9,7 @@
 let white = [' ' '\t']+
 let digit = ['0'-'9']
 let float = '-'? digit+ '.'? digit*
-let letter = ['a'-'z' 'A'-'Z']
+let letter = ['a'-'z' 'A'-'Z' '_' ]
 let bool_id = "true\\|false"
 let id = letter+
 

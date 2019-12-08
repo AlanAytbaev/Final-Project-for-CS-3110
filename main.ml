@@ -1,12 +1,9 @@
 open Ast
 open Stdlib
 open ANSITerminal
-open Arithmetic
 open Environment
 open Lexing
 open Printf
-open Trigonometric
-open Statistics
 open Imports
 
 module type Main_Sig = sig
@@ -135,7 +132,7 @@ module Main = struct
     let v = step env e in 
     match uop, v with 
     |Func_u str, v1 -> (Imports.find_function str) [v1]
-    |_ -> failwith "precondition violated"
+  (* |_ -> failwith "precondition violated" *)
 
   and eval_if e1 e2 e3 env = 
     let v = step env e1 in 
@@ -153,7 +150,7 @@ module Main = struct
     match bop, e1', e2' with
     | Func str, v1, v2 ->
       (Imports.find_function str) [v1;v2]
-    | _ -> failwith "precondition violated - step bop"
+  (* | _ -> failwith "precondition violated - step bop" *)
 
   and string_of_var e = match e with 
     | Var e -> e
@@ -306,21 +303,67 @@ module Main = struct
     with
     |SyntaxError s |Failure s -> (s, curr_env)
 
+  (** [days] is the array of possible values of the days of the week *)
+  let days = [| "Sunday"; "Monday"; "Tuesday"; "Wednesday"; 
+                "Thursday";"Friday"; "Saturday"|]
+  (** [months] is the array of possible values of the months *)
+  let months = [| "January"; "February"; "March"; "April"; "May"; "June";
+                  "July"; "August"; "September"; "October"; 
+                  "November"; "Dececmber" |]
+
+  (** [time_helper tm] prints out the current time and date when prompted
+      by the user  *)
+  let time_helper tm = 
+    let tm' = Unix.localtime tm in 
+    let () = printf "Date -  %s %s %d, %d \n" 
+        days.(tm'.tm_wday) months.(tm'.tm_mon) tm'.tm_mday (tm'.tm_year + 1900) in
+    let () = printf "Time -  %02d:%02d:%02d" 
+        tm'.tm_hour tm'.tm_min tm'.tm_sec in ()
+
   let rec help_command_helper chnl =
     match input_line chnl with
     |s -> print_endline s; help_command_helper chnl
     |exception End_of_file -> close_in chnl
+
+  (** DOCUMENT THIS *)
+  let rec text_file_reader chnl =
+    match input_line chnl with
+    |s -> print_endline s; text_file_reader chnl
+    |exception End_of_file -> close_in chnl
+
+
+  let rec code_file_reader chnl env = 
+    match input_line chnl with 
+    |s -> print_endline s;let r = interp s env in 
+      let () = print_endline (fst r) in code_file_reader chnl (snd r)
+    |exception End_of_file -> close_in chnl
+
 
   let rec main () curr_env =
     ANSITerminal.print_string [red] ">";
     match String.trim (String.lowercase_ascii (read_line())) with
     |"quit" -> ()
     |"help" -> let chnl = open_in "help.txt" in help_command_helper chnl; main () curr_env
-    |e -> match (interp e curr_env) with
-      |exception Not_found -> print_endline "Not a valid command please try again"; main () curr_env
-      |(s, env) -> print_endline s;
-        print_endline "";
-        main () env
+    |"time" -> let tm = Unix.time() in 
+      time_helper tm;print_endline (""); main () curr_env
+    |"monty hall game"-> let () = Monty.start() in main() curr_env
+    |"monty hall explanation" -> let chnl = open_in "monty_explain.txt" in 
+      text_file_reader chnl; main() curr_env
+    |e -> 
+      try (
+        if (((String.length e) > 5) && ((String.sub e ((String.length e) - 4) (4)) = ".txt") ) then  
+          let chnl = open_in e in code_file_reader chnl curr_env;
+          main() curr_env 
+        else 
+          match (interp e curr_env) with
+          |exception Not_found -> print_endline "Not a valid command please try again - hi"; main () curr_env
+          |(s, env) -> print_endline s;
+            print_endline "";
+            main () env) 
+
+      with 
+      |Invalid_argument e -> 
+        print_endline "Not a valid command please try again"; main () curr_env
 
   (**BEGIN Externs *)
   let graph (c, left_bound, right_bound, env) = 
