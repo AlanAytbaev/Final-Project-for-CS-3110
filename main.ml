@@ -388,7 +388,10 @@ module Main = struct
       | e -> ()
     done;
     close_out out_handle;
-    let _ = Sys.command "gnuplot -c gnuplot_script.txt" in 
+    ignore (Sys.command "gnuplot -c gnuplot_script.txt");
+    if (Sys.command "which open" )= 0 then ignore (Sys.command "open fig.png")
+    else if Sys.command "which xdg-open" = 1 then ignore 
+        (Sys.command "xdg-open fig.png");
     Boolean true
 
   let derivative_helper (c : value) (x1_val : value) (h_val : value) =
