@@ -23,15 +23,15 @@ module Imports = struct
   let fib = Fib_CFU.operation_list
   let newset = NewSet_CFU.operation_list
 
-  let cfu_list = [arith;trig;matrix;set;fib;newset]
+  let cfu_list = [arith;trig;matrix;set;fib;newset;stats]
 
   let operation_list = List.append cfu_list [] |> List.flatten
 
-  let rec map_of_functions operations acc = 
+  let rec map_of_functions operations acc =
     match operations with
     | [] -> acc
     | h::t ->
-      let name = fst h in 
+      let name = fst h in
       let f = snd h in
       let env' = Env.add name (Extern (ExtFun f)) acc in
       map_of_functions t env'
