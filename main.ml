@@ -87,6 +87,7 @@ module Main = struct
     |Var x -> x
     |Binop _ -> "binop"
     |Unop _ -> "unop"
+    |Arr _ -> "arr"
 
   let string_of_value  = function
     |VBool b -> string_of_bool b
@@ -209,12 +210,10 @@ module Main = struct
     | _ -> env
 
   and eval_seq e1 e2 curr_env = 
-    print_endline "eval_seq";
     let _ = step curr_env e1 in 
     step curr_env e2
 
   and eval_dseq d e cur_env = 
-    print_endline "eval_dseq";
     let (v , env') = eval_defn cur_env d in 
     step env' e
 
@@ -268,7 +267,6 @@ module Main = struct
     (VRow array, env)
 
   and eval_let_defn (env1:env) id e =
-    print_endline "eval_let_defn";
     let v = step env1 e  in
     let env' = Env.add id v env1 in
     (v, env')
@@ -301,7 +299,7 @@ module Main = struct
     (VRow array, curr_env)
 
   and eval_matrix (lst : value list) (curr_env : env) =
-    let column_length = match List.hd lst with
+    let _column_length = match List.hd lst with
       | VRow v -> Array.length v
       | _ -> failwith "eval_matrix failure, cannot be a row"
     in
@@ -367,7 +365,7 @@ module Main = struct
     match input_line chnl with
     |s -> print_endline s;let r = interp s env in
       let () = print_endline (fst r) in code_file_reader chnl (snd r)
-    |exception End_of_file -> close_in chnl
+    |exception End_of_file -> close_in chnl; env
 
 
   let rec main () curr_env =
@@ -386,11 +384,12 @@ module Main = struct
 
       try (
         if (((String.length e) > 5) && ((String.sub e ((String.length e) - 4) (4)) = ".txt") ) then
-          let chnl = open_in e in code_file_reader chnl curr_env;
-          main() curr_env
+          let chnl = open_in e in 
+          let env' =  code_file_reader chnl curr_env in 
+          main() env'
         else
           match (interp e curr_env) with
-          |exception Not_found -> print_endline "Not a valid command please try again - hi"; main () curr_env
+          |exception Not_found -> print_endline "Not a valid command please try again"; main () curr_env
           |(s, env) -> print_endline s;
             print_endline "";
             main () env)
