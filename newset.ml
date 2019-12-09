@@ -59,9 +59,9 @@ module NewSet_Functions : NewSet_Funcs = struct
   let rec check_elements_helper_2 x y int bool= 
     match int with 
     |0 -> bool
-    |_ -> if (Array.mem x.(int-1) y) 
+    |i -> if (Array.mem x.(i-1) y) 
       then  false
-      else check_elements_helper x y (int-1) (true&&bool) 
+      else check_elements_helper_2 x y (i-1) (true&&bool) 
 
   (** [isDisjoint x y] returns true if none of the elements in [x] are
       in [y] and returns false otherwise*)
