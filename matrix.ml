@@ -19,6 +19,9 @@ module type Matrix_Funcs = sig
   val echelon_form : value list -> value 
 
   val reduced_echelon_form : value list -> value
+
+  val determinant : value list -> value
+
 end
 
 module Matrix_Functions : Matrix_Funcs = struct
@@ -194,6 +197,25 @@ module Matrix_Functions : Matrix_Funcs = struct
     let x1' = reverse_rows x1 in
     let _ = echelon_form_helper x1' in
     VMatrix (x1')
+
+  let rec diagonal_product x1 acc i n =
+    if i <= n then
+      let acc' = acc *. x1.(i).(i) in
+      diagonal_product x1 acc' (i+1) n
+    else
+      acc
+
+  let determinant v =
+    let x1 = List.nth v 0 |> unwrap_matrix in
+    let row_num = (Array.length x1) - 1 in
+    let col_num = Array.length (Array.get x1 0) - 1 in
+    if row_num == col_num then
+      let x2 = Array.copy x1 in
+      let v2 = VMatrix (x2) in
+      let v2' = reduced_echelon_form [v2] in
+      let x2' = v2' |> unwrap_matrix in
+      VFloat (diagonal_product x2' 1. 0 col_num)
+    else failwith "Cannot take determinant of non-square matrix"
 end
 
 module Matrix_CFU : CFU_sig = struct
@@ -203,6 +225,7 @@ module Matrix_CFU : CFU_sig = struct
     ("mdot", Matrix_Functions.dot_product_matrix);
     ("echelon", Matrix_Functions.echelon_form);
     ("rref", Matrix_Functions.reduced_echelon_form);
+    ("determinant", Matrix_Functions.determinant);
   ]
 
 end
