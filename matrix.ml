@@ -107,14 +107,14 @@ module Matrix_Functions : Matrix_Funcs = struct
       let new_matrix = make_matrix_helper x_row_length y_column_length in 
       let () = 
         for i = 0 to (x_row_length - 1) do 
-          for j = 0 to (x_column_length - 1) do
+          for j = 0 to (y_column_length - 1) do
             new_matrix.(i).(j) <- helper_extract i j x1 y1 
           done
         done in new_matrix
 
   let dot_product_matrix (v : value list) = 
     let x1 = List.nth v 0 |> unwrap_matrix in
-    let x2 = List.nth v 0 |> unwrap_matrix in
+    let x2 = List.nth v 1 |> unwrap_matrix in
     VMatrix (dot_product_matrix_helper x1 x2)
 
   let fuzzy_compare a b = 
@@ -141,13 +141,10 @@ module Matrix_Functions : Matrix_Funcs = struct
   let reduce_row x1 r r' = 
     let col_num = Array.length (Array.get x1 0) -1 in
     let p = pivot_pos x1.(r') in 
-    print_endline ("Pivot position:"^(string_of_int p));
     if p == -1  then () else
       let factor = x1.(r).(p) /. x1.(r').(p) in 
-      print_endline ("Factor:"^(string_of_float factor));
       let _ =
         for c = 0 to col_num do 
-          print_endline ("Subtracting "^(string_of_float x1.(r).(c))^(string_of_float (x1.(r').(c) *.factor)));
           x1.(r).(c) <- (x1.(r).(c) -. x1.(r').(c) *.factor)
         done 
       in ()
@@ -157,7 +154,6 @@ module Matrix_Functions : Matrix_Funcs = struct
     let col_num = Array.length (Array.get x1 0) - 1 in
     let x1' = make_matrix_helper (row_num + 1) (col_num + 1) in 
     let _ = for r = 0 to row_num do
-        print_endline ("=======");
         x1'.(row_num - r) <- x1.(r)
       done
     in
@@ -179,7 +175,6 @@ module Matrix_Functions : Matrix_Funcs = struct
     let _ = 
       for r' = 0 to row_num do
         for r = r'+1 to row_num do
-          print_endline "Reducing";
           let _ = reduce_row x1 r r' in
           let _ = balance_row x1.(r) in ()
         done

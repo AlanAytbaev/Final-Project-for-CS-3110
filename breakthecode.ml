@@ -17,8 +17,6 @@ let perm =
   let n4 = Random.int 10 in 
   let n5 = Random.int 10 in 
   let list = n1 :: n2 :: n3 :: n4 :: n5 :: [] in 
-  print_endline ((string_of_int n1)^(string_of_int n2)^
-                 (string_of_int n3)^(string_of_int n4)^(string_of_int n5));
   list 
 
 
