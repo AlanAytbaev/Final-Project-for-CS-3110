@@ -42,7 +42,8 @@ module MySet_Functions : MySet_Funcs = struct
         (s2) else (s1) in 
     let longest_ar = if ((Array.length s1) > (Array.length s2)) then 
         (s1) else (s2) in 
-    Array.of_list (helper shortest_ar longest_ar (Array.length longest_ar))
+    Array.of_list (List.rev 
+                     (helper shortest_ar longest_ar (Array.length longest_ar)))
 
 
   let intersect (v : value list) =
