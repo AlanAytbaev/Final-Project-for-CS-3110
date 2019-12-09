@@ -80,7 +80,8 @@ module Matrix_Functions : Matrix_Funcs = struct
   let rec helper_sum_product row_product col_product acc= 
     match acc with 
     |0 -> 0.
-    |_ ->(row_product.(acc-1)*.col_product.(acc-1)) +. (helper_sum_product row_product col_product (acc-1))
+    |_ ->(row_product.(acc-1)*.col_product.(acc-1)) +. 
+         (helper_sum_product row_product col_product (acc-1))
 
 
   let helper_extract row_num col_num matr1 matr2 = 

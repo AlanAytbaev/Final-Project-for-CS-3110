@@ -1,9 +1,12 @@
 open Ast
 
 module type Imports_Sig = sig
-  (** [find s] is the operation that is associated with [s] in the operation
-      list *)
+
+  (** [find_function s] is the operation that is associated with [s] 
+      in the operationlist *)
   val find_function : string -> (value list -> value)
+
+  (** DOCUMENT ME *)
   val functions_map : env
 end
 module Imports : Imports_Sig

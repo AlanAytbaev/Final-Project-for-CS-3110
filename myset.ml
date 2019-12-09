@@ -13,39 +13,46 @@ end
 
 module MySet_Functions : MySet_Funcs = struct
 
+  (** [unwrap_float v] is the float extracted from value [v] *)
   let unwrap_float (v : value) =
     match v with
     | VFloat x -> x
     | _ -> failwith "This cannot occur - matrix.ml"
 
+  (** [unwrap_row v] is the row extracted from value [v] *)
   let unwrap_row (v : value) : float array =
     match v with
     | VRow x -> x
     | _ -> failwith "This cannot occur - matrix.ml"
 
-  let helper' lst = 
-    Array.of_list lst 
-
 
   (** [helper short long acc] is a list containing the elements present 
-        in both [short] and [long] *)
+      in both [short] and [long] *)
   let rec helper short long acc = 
     match acc with 
     |0 -> []
-    |i -> let v = long.(i-1) in if (Array.mem v short) then v :: helper short long (acc -1 ) else  helper short long (acc -1 )
+    |i -> let v = long.(i-1) in 
+      if (Array.mem v short) then v :: helper short long (acc -1 ) else 
+        helper short long (acc -1 )
 
+  (** [intersect_helper s1 s2] is the array containing the elements present 
+        in both [s1] and [s2] *)
   let intersect_helper s1 s2 = 
     let shortest_ar = if ((Array.length s1) > (Array.length s2)) then 
         (s2) else (s1) in 
     let longest_ar = if ((Array.length s1) > (Array.length s2)) then 
         (s1) else (s2) in 
-    helper' (helper shortest_ar longest_ar (Array.length longest_ar))
+    Array.of_list (helper shortest_ar longest_ar (Array.length longest_ar))
+
 
   let intersect (v : value list) =
     let s1 = List.nth v 0 |> unwrap_row in 
     let s2 = List.nth v 1 |> unwrap_row in
     VRow (intersect_helper s1 s2)
 
+
+  (**  [difference_helper s1 s2 acc] is the list of elements contained in 
+       [s1] and not in [s2] *)
   let rec difference_helper s1 s2 acc = 
     match acc with 
     |0 -> []
@@ -59,6 +66,9 @@ module MySet_Functions : MySet_Funcs = struct
     let lst = (difference_helper s1 s2 (Array.length s1)) in 
     VRow (Array.of_list lst)
 
+
+  (** [union_helper s1 s2] is the array with elements contained in both [s1] and 
+      [s2] *)
   let union_helper s1 s2 = 
     let l1 = Array.to_list s1 in 
     let l2 = Array.to_list s2 in 
@@ -67,7 +77,7 @@ module MySet_Functions : MySet_Funcs = struct
     Array.of_list l4 
 
   let union v = 
-    let s1 = List.nth v 0 |> unwrap_row in 
+    let s1 = List.nth v 0 |> unwrap_row in  
     let s2 = List.nth v 1 |> unwrap_row in
     VRow (union_helper s1 s2)
 

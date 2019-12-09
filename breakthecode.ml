@@ -3,8 +3,12 @@ open Stdlib
 open ANSITerminal
 open Printf
 
+
+(** [Error] is the error for a game play error *)
 exception Error of string
 
+
+(**  [perm] generates the random 5 number code *)
 let perm = 
   Random.self_init();
   let n1 = Random.int 10 in 
@@ -18,19 +22,24 @@ let perm =
   list 
 
 
+(** [end_game_lose perm] is the end game message to print out when the user
+    has used all their chances and has not correctly guess the code *)
 let end_game_lose perm = 
   print_endline "You have used all your chances... 
   The correct code was: "; 
-  List.iter (printf "%d ") perm; ()
+  List.iter (printf "%d ") perm; print_endline""; ()
 
+
+(** [my_compare guess perm] is the result of checking if [guess] and [perm]
+    are equal *)
 let my_compare guess perm = 
   let str = List.fold_left (fun acc i -> acc^(string_of_int i)) "" perm in 
   str = guess
 
 
-let end_game_win x = 
-  print_endline "Congratulations, You have won!! "
-
+(** [hint_printer guess perm num] prints out the hint string according to the 
+    user's most recent guess according to the rules defined, handling 
+    invalid guesses *)
 let rec hint_printer guess perm guessnumber =
   try (
     let s1 = if (string_of_int(List.nth perm 0) = String.sub guess 0 1) then "."
@@ -56,6 +65,8 @@ let rec hint_printer guess perm guessnumber =
     game_play guess perm guessnumber
 
 
+(** [game_play guess perm num] prints out the result of the user playing the 
+    Break the Code game *)
 and game_play guess perm guessnumber = 
   try(
     match guessnumber with 
@@ -73,8 +84,6 @@ and game_play guess perm guessnumber =
     print_string [cyan] "\n>";
     let guess = String.trim (String.uppercase_ascii (read_line())) in
     game_play guess perm guessnumber
-
-
 
 
 

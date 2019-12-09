@@ -5,6 +5,8 @@ open Ast
     A module that matches [CFU_sig] is suitable for use in the [Calc] module. *)
 module type CFU_sig = sig
 
+  (** An [operation_list] is an association list that maps operation 
+        symbols to functions *)
   val operation_list : (string * ( value list -> value)) list
 
 end

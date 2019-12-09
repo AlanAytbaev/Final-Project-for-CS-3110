@@ -29,7 +29,8 @@ module Set_Functions : Set_Funcs = struct
   let rec helper short long acc = 
     match acc with 
     |0 -> []
-    |i -> let v = long.(i-1) in if (Array.mem v short) then v :: helper short long (acc -1 ) else  helper short long (acc -1 )
+    |i -> let v = long.(i-1) in if (Array.mem v short) then 
+        v :: helper short long (acc -1 ) else  helper short long (acc -1 )
 
   let intersect_helper s1 s2 = 
     let shortest_ar = if ((Array.length s1) > (Array.length s2)) then 

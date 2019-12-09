@@ -12,6 +12,8 @@ type game_state =
     item : door; 
     switched : string;
   }
+
+(** [Error] is the error for a game play error *)
 exception Error of string
 
 (** [fst triple] is the first element of [triple] *)

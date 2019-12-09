@@ -19,6 +19,8 @@ end
 
 module Fib_Functions : Fib_Funcs  = struct 
 
+  (** [unwrap v] is the float extracted from value [v] 
+        requires: [v] has type VFloat *)
   let unwrap v =
     match v with
     | VFloat x -> x
@@ -31,22 +33,24 @@ module Fib_Functions : Fib_Funcs  = struct
       |[] -> 0.
       |h :: t -> h +. sum (n-.1.) t
 
-  (** [help] is the first [k] elements of the [n]-step fibonacci sequence*)
-  let rec help n k lst = 
+  (** [nacci_help n k lst] is the first [k] 
+      elements of the [n]-step fibonacci sequence*)
+  let rec nacci_help n k lst = 
     if k = 0. then List.rev lst 
     else
       let x = (sum n lst) :: lst in 
-      help n (k-.1.) x
+      nacci_help n (k-.1.) x
 
 
-  (**  [nacci] is the first [k] elements of the [n]-step fibonacci sequence
+  (**  [nacci n k] is the first [k] elements of the [n]-step fibonacci sequence
        Requires n , k > 0 *)
   let nacci n k =
     match k with
     | 1. -> [1.]
-    | _ -> help n (k-.1.) [1.]
+    | _ -> nacci_help n (k-.1.) [1.]
 
-
+  (** [nfib_list_helper a b] is the array of the fist [b] elements of the 
+      [a]-step fibonacci sequence *)
   let nfib_list_helper a b = 
     let lst = nacci (a) (b) in 
     Array.of_list lst 
@@ -56,6 +60,7 @@ module Fib_Functions : Fib_Funcs  = struct
     let b = List.nth v 1 |> unwrap in 
     VRow (nfib_list_helper a b)
 
+  (** [nth_element v] is the [v]th element of the fibonacci sequence *)
   let rec nth_element v  = 
     match v with 
     |0. |1. as n -> n
@@ -66,6 +71,8 @@ module Fib_Functions : Fib_Funcs  = struct
     let i = nth_element (n) in 
     VRow [|i|]
 
+  (** [lst_helper v] is the list representation of the first [v] elements of the
+      fibonacci sequence *)
   let rec lst_helper v = 
     match v with 
     |0. | 1. -> 1. :: []
@@ -77,7 +84,6 @@ module Fib_Functions : Fib_Funcs  = struct
     let lst'' = List.rev lst' in 
     VRow (Array.of_list lst'')
 end 
-
 
 
 module Fib_CFU : CFU_sig = struct

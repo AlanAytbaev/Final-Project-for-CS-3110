@@ -4,7 +4,7 @@ open Ast
     A module that matches [Arithmetic_Funcs] is suitable for use in
     [Arithmetic_CFU]. *)
 module type Arithmetic_Funcs = sig
-  val add2 : value list -> value
+  val add : value list -> value
   val subtract : value list -> value
   val multiply : value list -> value
   val divide : value list -> value
@@ -24,12 +24,15 @@ module type CFU_sig = sig
 end
 
 module Arithmetic_Functions : Arithmetic_Funcs = struct
+
+  (** [unwrap v] is the float extracted from value [v] 
+      requires: [v] has type VFloat *)
   let unwrap v =
     match v with
     | VFloat x -> x
     | _ -> failwith "This cannot occur - arithmetic.ml"
 
-  let add2 (s : value list) =
+  let add (s : value list) =
     match s with
     | hd1::hd2::tl -> 
       let (hd1', hd2') = (unwrap hd1, unwrap hd2) in
@@ -71,11 +74,9 @@ module Arithmetic_Functions : Arithmetic_Funcs = struct
       VFloat (Stdlib.mod_float hd1' hd2')
     | _ -> failwith "InvalidInput"
 
+  (** [log a b] computes the logarithm of [a] with base [b] *)
   let rec log (a : float) (b : float) =
-    let n = (Float.compare a b) in
-    match n with
-    | _ when n < 0 -> a
-    | _ -> 1.0 +. log (Float.div a b) b
+    if a > 1. then 1.0 +. log (Float.div a b) b else 0.
 
   let logarithm (s : value list) =
     match s with
@@ -95,7 +96,7 @@ end
 module Arithmetic_CFU : CFU_sig = struct
 
   let operation_list = [
-    ("+", Arithmetic_Functions.add2);
+    ("+", Arithmetic_Functions.add);
     ("-", Arithmetic_Functions.subtract);
     ("*", Arithmetic_Functions.multiply);
     ("/", Arithmetic_Functions.divide);
