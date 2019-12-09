@@ -18,7 +18,7 @@ module type Matrix_Funcs = sig
 
   val echelon_form : value list -> value 
 
-  val reduced_echelon_form: value list -> value
+  val reduced_echelon_form : value list -> value
 end
 
 module Matrix_Functions : Matrix_Funcs = struct
@@ -154,9 +154,11 @@ module Matrix_Functions : Matrix_Funcs = struct
     let col_num = Array.length (Array.get x1 0) - 1 in
     let x1' = make_matrix_helper (row_num + 1) (col_num + 1) in 
     let _ = for r = 0 to row_num do
-        x1'.(row_num - r) <- x1.(row_num)
+        print_endline ("=======");
+        x1'.(row_num - r) <- x1.(r)
       done
-    in ()
+    in
+    x1'
 
   let pivot_sort x1 = 
     Array.stable_sort
@@ -189,11 +191,9 @@ module Matrix_Functions : Matrix_Funcs = struct
   let reduced_echelon_form v = 
     let x1 = List.nth v 0 |> unwrap_matrix in
     let _ = echelon_form_helper x1 in
-    let _ = reverse_rows x1 in
-    let _ = echelon_form_helper in
-    let _ = reverse_rows x1 in
-    VMatrix (x1)
-
+    let x1' = reverse_rows x1 in
+    let _ = echelon_form_helper x1' in
+    VMatrix (x1')
 end
 
 module Matrix_CFU : CFU_sig = struct
