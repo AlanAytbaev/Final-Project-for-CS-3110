@@ -45,7 +45,10 @@ seq_expr:
         { e }
   | e = expr; SEMI
         { e }
-
+  | e = expr; SEMI ; s = seq_expr ; 
+        {Sequence (e,s) }
+  | e = defn; SEMI ; s = seq_expr ; 
+        {DSequence (e,s) }
  
 
 expr:
@@ -72,6 +75,7 @@ expr:
 |CSC; e = expr { Unop (Func_u "csc", e) }
 |COT; e = expr { Unop (Func_u "cot", e) }
 
+
 s_expr: 
 | x = iden { Var x }
 | s = FLT { Float s }
@@ -83,6 +87,7 @@ s_expr:
 | b = BOOL { Boolean b }
 | TRUE { Boolean true }
 | FALSE { Boolean false }
+| r = LBRACK; e = nonempty_list(s_expr); RBRACK { Arr (e) }
 
 /* rm_expr:
 |x = ID; EQUALS; r = nonempty_list(num); SEMI; { MRow (x, r) }  */

@@ -1,7 +1,6 @@
 open Ast
 open Stdlib
 open ANSITerminal
-open Environment
 open Lexing
 open Printf
 open Imports
@@ -83,6 +82,8 @@ module Main = struct
     |Let _ -> "let"
     |Fun (s, e)-> "fun"
     |FunApp (s, e) -> "fun app"
+    |Sequence (e1,e2) -> "sequence of expressions"
+    |DSequence (d,e) -> "Definition Sequence"
     |Var x -> x
     |Binop _ -> "binop"
     |Unop _ -> "unop"
@@ -116,7 +117,7 @@ module Main = struct
 
   let rec step (curr_env:env) expr =
     match expr with
-    | Float x -> VFloat ( x)
+    | Float x -> VFloat (x)
     | Var y ->  Env.find y curr_env
     | String s ->  (VString s)
     | Boolean b -> (VBool b)
@@ -125,9 +126,11 @@ module Main = struct
     | Let (x, e1, e2) -> eval_let_expr curr_env x e1 e2
     | If (e1, e2, e3) -> eval_if e1 e2 e3 curr_env
     | Fun (s,e) -> Closure (s, e, curr_env)
+    | Sequence (e1,e2) -> eval_seq e1 e2 curr_env
+    | DSequence (d,e) -> eval_dseq d e curr_env
     | FunApp (e1,e2) -> eval_fun e1 e2 curr_env
     | Unop (unop, e) -> eval_unop unop e curr_env
-
+    | Arr (e) -> fst (eval_row e curr_env)
 
   and eval_unop uop e env =
     let v = step env e in
@@ -182,6 +185,9 @@ module Main = struct
     |Extern (GExtFun g) ->
       let v2 = (eval_id_list e2 env) in
       step env (g (List.nth v2 0 , List.nth v2 1, List.nth v2 2, env))
+    | Extern (MExtFun g) ->
+      let v2 = (eval_id_list e2 env) in
+      (g v2 env)
     |_-> failwith "function failure"
 
   and eval_id_list e2 env =
@@ -202,27 +208,45 @@ module Main = struct
       add_bindings idt vt env'
     | _ -> env
 
+  and eval_seq e1 e2 curr_env = 
+    print_endline "eval_seq";
+    let _ = step curr_env e1 in 
+    step curr_env e2
+
+  and eval_dseq d e cur_env = 
+    print_endline "eval_dseq";
+    let (v , env') = eval_defn cur_env d in 
+    step env' e
+
+  (** [eval_defn env e] is the (v, env') where [v] is such that
+      [<env, e> ==> <v, env'>]. *)
+  and eval_defn env e = 
+    match e with
+    |MRow (id, e) -> eval_mrow id e env
+    |DLet (id, e1) -> eval_let_defn env id e1
+    |MLet (id, e) -> eval_mlet_defn id e env
+    |SLet (id, e) -> eval_slet id e env
   (** TODO: DOCUMENT *)
-  let rec eval_row_id_list lst env =
+  and eval_row_id_list lst env =
     match lst with
     |[] -> []
     |h :: t -> let h = Var h in (step env h) :: (eval_row_id_list t env)
 
   (** TODO: DOCUMENT *)
-  let array_getter e =
+  and array_getter e =
     match e with
     |VRow e -> e
     |_ -> failwith "wrong type of arguement"
 
   (** TODO: DOCUMENT *)
-  let rec array_updater lst array acc =
+  and array_updater lst array acc =
     match lst with
     |[] -> array
     |h :: t -> let ar = array_getter h in
       let () = array.(acc) <- ar in array_updater t array (acc+1)
 
   (** TODO: DOCUMENT *)
-  let eval_mlet_defn id e env =
+  and eval_mlet_defn id e env =
     let lst_of_arrays = eval_row_id_list e env in
     let column_length = List.nth lst_of_arrays 0
                         |> array_getter
@@ -233,7 +257,7 @@ module Main = struct
     (array', env')
 
   (** TODO: DOCUMENT *)
-  let eval_mrow x lst curr_env =
+  and eval_mrow x lst curr_env =
     let a = eval_id_list lst curr_env in
     let a' = values_to_floats a in
     let array = Array.make (List.length a') 0. in
@@ -243,48 +267,54 @@ module Main = struct
     let env = Env.add x (VRow array) curr_env in
     (VRow array, env)
 
-  (** TODO: DOCUMENT *)
-  let eval_mlet_defn id e env =
-    let lst_of_arrays = eval_row_id_list e env in
-    let column_length = List.nth lst_of_arrays 0
-                        |> array_getter
-                        |> Array.length in
-    let array = Array.make_matrix  (List.length e) column_length 0. in
-    let array' = VMatrix (array_updater lst_of_arrays array 0) in
-    let env' = Env.add id array' env in
-    (array', env')
-
-  let eval_let_defn (env1:env) id e =
+  and eval_let_defn (env1:env) id e =
+    print_endline "eval_let_defn";
     let v = step env1 e  in
     let env' = Env.add id v env1 in
     (v, env')
 
   (** TODO: DOCUMENT *)
-  let float_getter v =
+  and float_getter v =
     match v with
     |VFloat v -> v
     |_ -> failwith "invalid argument"
 
   (** TODO: DOCUMENT  - duplicate function??? *)
-  let rec eval_id_lst_flts lst env =
+  and eval_id_lst_flts lst env =
     match lst with
     |[] -> []
     |e :: t -> ( float_getter (step env e)) :: (eval_id_lst_flts t env)
 
   (** TODO: DOCUMENT *)
-  let eval_slet id e env =
+  and eval_slet id e env =
     let vlst = (VFloatList (eval_id_lst_flts e env)) in
     let env' = Env.add id vlst env in
     (vlst, env')
 
-  (** [eval_defn env e] is the (v, env') where [v] is such that
-      [<env, e> ==> <v, env'>]. *)
-  let eval_defn env e =
-    match e with
-    |MRow (id, e) -> eval_mrow id e env
-    |DLet (id, e1) -> eval_let_defn env id e1
-    |MLet (id, e) -> eval_mlet_defn id e env
-    |SLet (id, e) -> eval_slet id e env
+  and eval_row lst curr_env =
+    let a = eval_id_list lst curr_env in
+    let a' = values_to_floats a in
+    let array = Array.make (List.length a') 0. in
+    let () = for i = 0 to ((List.length a') - 1) do
+        array.(i) <- List.nth a' i
+      done in
+    (VRow array, curr_env)
+
+  and eval_matrix (lst : value list) (curr_env : env) =
+    let column_length = match List.hd lst with
+      | VRow v -> Array.length v
+      | _ -> failwith "eval_matrix failure, cannot be a row"
+    in
+    let a = 
+      List.map 
+        (fun v -> 
+           match v with
+           |VRow f -> f
+           | _ -> failwith "eval_matrix failure, cannot be a row")
+        lst
+      |> Array.of_list
+    in
+    VMatrix a
 
   let rec eval_phrase env exp =
     match exp with
@@ -344,7 +374,7 @@ module Main = struct
     ANSITerminal.print_string [red] ">";
     match String.trim (String.lowercase_ascii (read_line())) with
     |"quit" -> ()
-    |"clear" -> Unix.system "clear"; main () curr_env
+    |"clear" -> let _ = Unix.system "clear"in main () curr_env
     |"help" -> let chnl = open_in "help.txt" in help_command_helper chnl; main () curr_env
     |"time" -> let tm = Unix.time() in
       time_helper tm;print_endline (""); main () curr_env
@@ -455,6 +485,11 @@ module Main = struct
               (List.nth v 2 |> unwrap_float)
               (0.0))
 
+  let unwrap_string v =
+    match v with
+    | String s -> s
+    | _ -> failwith "Type error, expected string - main.ml"
+
   (**END Externs *)
 
   let initial_env =
@@ -472,7 +507,8 @@ module Main = struct
        |> Env.add "graph" (Extern (GExtFun (graph)))
        |> Env.add "deriv" (Extern (ExtFun (derivative)))
        |> Env.add "integ" (Extern (ExtFun (integrate)))
-       |> Env.add "pi" (VFloat 3.14))
+       |> Env.add "pi" (VFloat 3.14) 
+       |> Env.add "matrix" (Extern (MExtFun (eval_matrix))))
 
   let run = fun () ->
     main () (initial_env)

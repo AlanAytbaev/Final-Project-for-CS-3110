@@ -15,7 +15,7 @@ and value =
   |VFloatList of float list
   |VRow of float array
 
-and matrix_type = float array array -> float array array -> float array array 
+and matrix_type = value list -> env -> value
 
 and set_type = float array -> float array  -> float array
 
@@ -48,11 +48,14 @@ and expr =
   |String of string
   |Float of float
   |Binop of bop * expr * expr
+  |Sequence of expr * expr
+  |DSequence of defn * expr
   |Unop of unop * expr
   |If of expr * expr * expr
   |Let of id * expr * expr
   |Fun of string list * expr
   |FunApp of expr * expr list
+  |Arr of expr list
 
 and defn = 
   |DLet of string * expr
