@@ -21,6 +21,13 @@ module type Matrix_Funcs = sig
   val sub_matrix : value list -> value
 
   val dot_product_matrix : value list -> value
+
+  val echelon_form : value list -> value
+
+  val reduced_echelon_form : value list -> value
+
+  val determinant : value list -> value
+
 end
 
 module Matrix_Functions : Matrix_Funcs

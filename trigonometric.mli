@@ -1,9 +1,12 @@
 open Ast
 
-(** An abstract module type that is meant to structure the CFU modules (ie. Arit    metic functions, calculus functions, statistics functions). A module that ma    tches [CFU_sig] is suitable for use in the [Calc] module. *)
+(** An abstract module type that is meant to structure the CFU modules 
+    (ie. Aritmetic functions, calculus functions, statistics functions).
+    A module that matches [CFU_sig] is suitable for use in the [Calc] module. *)
 module type CFU_sig = sig
 
-  (** An [operation_list] is an association list that maps operation symbo            ls to functions *)
+  (** An [operation_list] is an association list that maps operation 
+      symbols to functions *)
   val operation_list : (string * ( value  list -> value )) list
 
   (** [find s] is the operation that is associated with [s] in the operation
@@ -12,8 +15,9 @@ module type CFU_sig = sig
 end
 
 
-(** A module that implements the functions needed for the trigonometric cfu. A module
-    that matches [Trigonometric_Funcs] is suitable for use in [Trigonometric_CFU]. *)
+(** A module that implements the functions needed for the trigonometric cfu.
+    A module that matches [Trigonometric_Funcs] is suitable for use in
+    [Trigonometric_CFU]. *)
 module type Trigonometric_Funcs = sig
 
   (** [deg_to_rad f] is the radian representation of [f] *)
