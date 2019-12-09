@@ -6,9 +6,6 @@ module type CFU_sig = sig
   (** An [operation_list] is an association list that maps operation symbo            ls to functions *)
   val operation_list : (string * ( value  list -> value )) list
 
-  (** [find s] is the operation that is associated with [s] in the operation
-      list *)
-  val find_function : string -> (value list -> value)
 end
 
 (** A module that implements the functions needed for the arithmetic cfu. A modu    le that matches [Arithmetic_Funcs] is suitable for use in [Arithmetic_CFU]. *)
