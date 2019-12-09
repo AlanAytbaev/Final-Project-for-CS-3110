@@ -18,6 +18,7 @@ module type Matrix_Funcs = sig
 
   val echelon_form : value list -> value 
 
+  val reduced_echelon_form: value list -> value
 end
 
 module Matrix_Functions : Matrix_Funcs = struct
@@ -148,16 +149,27 @@ module Matrix_Functions : Matrix_Funcs = struct
         done 
       in ()
 
+  let reverse_rows x1 =
+    let row_num = (Array.length x1) - 1 in
+    let col_num = Array.length (Array.get x1 0) - 1 in
+    let x1' = make_matrix_helper (row_num + 1) (col_num + 1) in 
+    let _ = for r = 0 to row_num do
+        x1'.(row_num - r) <- x1.(row_num)
+      done
+    in ()
+
   let pivot_sort x1 = 
     Array.stable_sort
-      (fun row1 row2 -> 
-         (pivot_pos row2) - (pivot_pos row1))
+      (fun row1 row2 ->
+         let p1 = pivot_pos row1 in
+         let p2 = pivot_pos row2 in
+         if p1 == -1 then 1 else
+         if p2 == -1 then -1 else
+           (p1) - (p2))
       x1
-
 
   let echelon_form_helper x1 = 
     let row_num = (Array.length x1) -1 in
-    let _ = pivot_sort x1 in
     let _ = balance_row x1.(0) in
     let _ = 
       for r' = 0 to row_num do
@@ -167,27 +179,21 @@ module Matrix_Functions : Matrix_Funcs = struct
           let _ = balance_row x1.(r) in ()
         done
       done
-    in x1
-(*
-  let echelon_form_helper x1 = 
-    let row_num = Array.length x1 in 
-    let col_num = Array.length (Array.get x1 0) in
-    let () = for i = 0 to row_num-1 do 
-        for r = i+1 to row_num-1 do 
-          let factor = x1.(i).(i) /. x1.(r).(i) in 
-          for c = i to col_num-1 do 
-            x1.(r).(c) <- (x1.(r).(c)*.factor) -. x1.(i).(c) 
-          done ;
-          for c = i to col_num-1 do 
-            x1.(r).(c) <- x1.(r).(c) /. x1.(r).(i) 
-          done 
-        done 
-      done in 
-    x1 
-*)
+    in 
+    let _ = pivot_sort x1 in x1
+
   let echelon_form v = 
     let x1 = List.nth v 0 |> unwrap_matrix in
-    VMatrix (echelon_form_helper x1 )
+    VMatrix (echelon_form_helper x1)
+
+  let reduced_echelon_form v = 
+    let x1 = List.nth v 0 |> unwrap_matrix in
+    let _ = echelon_form_helper x1 in
+    let _ = reverse_rows x1 in
+    let _ = echelon_form_helper in
+    let _ = reverse_rows x1 in
+    VMatrix (x1)
+
 end
 
 module Matrix_CFU : CFU_sig = struct
@@ -196,6 +202,7 @@ module Matrix_CFU : CFU_sig = struct
     ("msub", Matrix_Functions.sub_matrix);
     ("mdot", Matrix_Functions.dot_product_matrix);
     ("echelon", Matrix_Functions.echelon_form);
+    ("rref", Matrix_Functions.reduced_echelon_form);
   ]
 
 end
