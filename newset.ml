@@ -16,11 +16,13 @@ end
 
 module NewSet_Functions : NewSet_Funcs = struct
 
+  (** [unwrap_float v] is the float extracted from value [v] *)
   let unwrap_float (v : value) =
     match v with
     | VFloat x -> x
     | _ -> failwith "This cannot occur - matrix.ml"
 
+  (** [unwrap_row v] is the row extracted from value [v] *)
   let unwrap_row (v : value) : float array =
     match v with
     | VRow x -> x
@@ -29,8 +31,10 @@ module NewSet_Functions : NewSet_Funcs = struct
   let helper' lst = 
     Array.of_list lst 
 
-  (** [check x y int bool] checks whether every element in x is present in y and
-      returns [bool] true if so and returns false if otherwise *)
+  (** [check_elements_helper x y int bool] checks whether every element in x is present in y and
+       returns [bool] true if so and false if otherwise *)
+
+
   let rec check_elements_helper x y int bool= 
     match int with 
     |0 -> bool
@@ -38,8 +42,10 @@ module NewSet_Functions : NewSet_Funcs = struct
       then check_elements_helper x y (i-1) (true&&bool) 
       else false
 
-  (** [isEqual x y] returns true if two sets contain structurally equal elements 
-      and have the same number of elements and returns false otherwise*)
+  (** [isEqual_helper x y] is true if two sets contain structurally 
+      equal elements and have the same number of elements and 
+      is false otherwise*)
+
   let isEqual_helper x y =
     if (Array.length x = Array.length y) then 
       check_elements_helper x y (Array.length x) true

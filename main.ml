@@ -9,6 +9,7 @@ open Imports
 module type Main_Sig = sig
   val interp : string -> env -> (string * env)
   val run : unit -> unit
+  val initial_env : env
 end
 
 module Main = struct
@@ -350,7 +351,9 @@ module Main = struct
     |"monty hall game"-> let () = Monty.start() in main() curr_env
     |"monty hall explanation" -> let chnl = open_in "monty_explain.txt" in
       text_file_reader chnl; main() curr_env
+    |"break the code game" -> let () = Breakthecode.start() in main () curr_env
     |e ->
+
       try (
         if (((String.length e) > 5) && ((String.sub e ((String.length e) - 4) (4)) = ".txt") ) then
           let chnl = open_in e in code_file_reader chnl curr_env;

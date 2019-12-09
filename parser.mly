@@ -92,8 +92,8 @@ s_expr:
 
 defn:
 |LET; x = ID; EQUALS; e1 = expr { DLet (x, e1) }
-|SLET; x = ID; EQUALS; LBRACK; e = nonempty_list(s_expr); RBRACK; SEMI { MRow (x, e) }
-|RLET; x = ID; EQUALS; LBRACK; e = nonempty_list(s_expr); RBRACK; SEMI { MRow (x, e) }
+|SLET; x = ID; EQUALS; LBRACK; e = nonempty_list(s_expr); RBRACK { MRow (x, e) }
+|RLET; x = ID; EQUALS; LBRACK; e = nonempty_list(s_expr); RBRACK { MRow (x, e) }
 |MLET; x = ID; EQUALS; e = nonempty_list(iden); SEMI { MLet (x, e) }
 
 iden:
