@@ -29,8 +29,6 @@ module type MySet_Funcs = sig
 
   val remove : value list -> value
 
-  val remove_element : value list -> value
-
   val length : value list -> value
 
   val get_element : value list -> value

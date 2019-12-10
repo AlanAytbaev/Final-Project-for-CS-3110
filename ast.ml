@@ -59,9 +59,7 @@ and expr =
 
 and defn = 
   |DLet of string * expr
-  |MRow of string * expr list
-  |MLet of string * id list
-  |SLet of string * expr list
+
 
 and phrase = 
   | Expr of expr

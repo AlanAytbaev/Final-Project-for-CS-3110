@@ -80,13 +80,14 @@ module Matrix_Functions : Matrix_Funcs = struct
 
   let sub_matrix (v : value list) = 
     let x1 = List.nth v 0 |> unwrap_matrix in
-    let y1 = List.nth v 0 |> unwrap_matrix in
+    let y1 = List.nth v 1 |> unwrap_matrix in
     VMatrix (sub_matrix_helper x1 y1)
 
   let rec helper_sum_product row_product col_product acc= 
     match acc with 
     |0 -> 0.
-    |_ ->(row_product.(acc-1)*.col_product.(acc-1)) +. (helper_sum_product row_product col_product (acc-1))
+    |_ ->(row_product.(acc-1)*.col_product.(acc-1)) +. 
+         (helper_sum_product row_product col_product (acc-1))
 
 
   let helper_extract row_num col_num matr1 matr2 = 
@@ -103,7 +104,8 @@ module Matrix_Functions : Matrix_Funcs = struct
     let x_column_length = Array.length (Array.get x1 0) in 
     let y_column_length = Array.length (Array.get y1 0) in 
     if (x_column_length <> (Array.length y1)) then
-      failwith "Invalid input - matrices must be the same size" else
+      failwith "Please make sure the matrices follow dimensions M x N, N x R" 
+    else
       let new_matrix = make_matrix_helper x_row_length y_column_length in 
       let () = 
         for i = 0 to (x_row_length - 1) do 

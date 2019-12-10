@@ -35,12 +35,14 @@ module Statistics_Functions : Statistics_Funcs = struct
     | _ -> failwith "This cannot occur - matrix.ml"
 
   let mean_unwrap (f : float list) =
-    (List.fold_left (fun acc x -> acc +. x) 0. f) /. (float_of_int(List.length f))
+    (List.fold_left (fun acc x -> acc +. x) 0. f) /.
+    (float_of_int(List.length f))
 
   let mean (v : value list) =
     match v with
     | hd::tl -> let s = (hd |> unwrap_row |> Array.to_list) in
-      VFloat ((List.fold_left (fun acc x -> acc +. x) 0. s) /. (float_of_int(List.length s)))
+      VFloat ((List.fold_left (fun acc x -> acc +. x) 0. s) /.
+              (float_of_int(List.length s)))
     | _ -> failwith "InvalidInput"
 
   let median (v : value list) =
@@ -60,9 +62,9 @@ module Statistics_Functions : Statistics_Funcs = struct
     | hd::tl -> let s = (hd |> unwrap_row |> Array.to_list)in
       let m = (v |> mean |> unwrap_float) in
       VFloat (s
-      |> List.map (fun x -> (x -. m) *. (x -. m))
-      |> mean_unwrap
-      |> Float.sqrt)
+              |> List.map (fun x -> (x -. m) *. (x -. m))
+              |> mean_unwrap
+              |> Float.sqrt)
     | _ -> failwith "InvalidInput"
 
   let rec min_helper (s : float list) min_acc=
@@ -102,16 +104,22 @@ module Statistics_Functions : Statistics_Funcs = struct
     match v with
     |[] -> failwith "wrong number of arguments"
     |h1::[] -> failwith "wrong number of arguments"
-    |n::r::[] -> if ((unwrap_float n)<(unwrap_float r)) then failwith "First argument must be greater"
-      else VFloat ((factorial (unwrap_float n)) /. (factorial ((unwrap_float n) -. (unwrap_float r))))
+    |n::r::[] -> if ((unwrap_float n)<(unwrap_float r)) then 
+        failwith "First argument must be greater"
+      else VFloat ((factorial (unwrap_float n)) /. 
+                   (factorial ((unwrap_float n) -. (unwrap_float r))))
     |_ -> failwith "wrong number of arguments"
 
   let combinations (v : value list) =
     match v with
     |[] -> failwith "wrong number of arguments"
     |h1::[] -> failwith "wrong number of arguments"
-    |n::r::[] -> if ((unwrap_float n)<(unwrap_float r)) then failwith "First argument must be greater" else
-        VFloat ((factorial (unwrap_float n)) /. ((factorial ((unwrap_float n) -. (unwrap_float r))) *. (factorial (unwrap_float r))))
+    |n::r::[] -> if ((unwrap_float n)<(unwrap_float r)) then 
+        failwith "First argument must be greater" else
+        VFloat ((factorial (unwrap_float n)) /. 
+                ((factorial ((unwrap_float n) -.
+                             (unwrap_float r))) *.
+                 (factorial (unwrap_float r))))
     |_ -> failwith "wrong number of arguments"
 end
 

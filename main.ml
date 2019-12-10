@@ -22,7 +22,8 @@ module Main = struct
   let parse_error lexbuf = raise (SyntaxError "Syntax error, please try again")
 
   (** [unexp_error lexbuf] is the error to raise when parser/lexeing fails *)
-  let unexp_err lexbuf = raise (UnexpectedError "Unexepcted error, please try again")
+  let unexp_err lexbuf = raise
+      (UnexpectedError "Unexepcted error, please try again")
 
 
   let parse parser_start s =
@@ -63,8 +64,10 @@ module Main = struct
     match lsts with
     |[] -> ""
     |h::t -> if (h == fst_element) then
-        "|"^ string_of_floatlst h ^"|" ^ matrix_to_string_helper t fst_element else
-        "\n |"^ string_of_floatlst h ^"|" ^ matrix_to_string_helper t fst_element
+        "|"^ string_of_floatlst h ^"|" ^
+        matrix_to_string_helper t fst_element else
+        "\n |"^ string_of_floatlst h ^"|" ^
+        matrix_to_string_helper t fst_element
 
   (** TODO: DOCUMENT *)
   let matrix_to_string m =
@@ -98,7 +101,8 @@ module Main = struct
     |Closure (x, e, env) -> "<closure>"
     |Extern e -> "<extern>"
     |VRow r ->
-      let s = Array.fold_left (fun acc s -> acc^ " " ^ (string_of_float s)) "" r
+      let s = Array.fold_left (fun acc s -> acc^ " " ^ 
+                                            (string_of_float s)) "" r
       in "["^s^"]"
     |VFloatList _ -> "float list values"
     |VMatrix m -> matrix_to_string m
@@ -137,7 +141,6 @@ module Main = struct
     let v = step env e in
     match uop, v with
     |Func_u str, v1 -> (Imports.find_function str) [v1]
-  (* |_ -> failwith "precondition violated" *)
 
   and eval_if e1 e2 e3 env =
     let v = step env e1 in
@@ -155,7 +158,6 @@ module Main = struct
     match bop, e1', e2' with
     | Func str, v1, v2 ->
       (Imports.find_function str) [v1;v2]
-  (* | _ -> failwith "precondition violated - step bop" *)
 
   and string_of_var e = match e with
     | Var e -> e
@@ -221,10 +223,8 @@ module Main = struct
       [<env, e> ==> <v, env'>]. *)
   and eval_defn env e = 
     match e with
-    |MRow (id, e) -> eval_mrow id e env
     |DLet (id, e1) -> eval_let_defn env id e1
-    |MLet (id, e) -> eval_mlet_defn id e env
-    |SLet (id, e) -> eval_slet id e env
+
   (** TODO: DOCUMENT *)
   and eval_row_id_list lst env =
     match lst with
@@ -244,27 +244,7 @@ module Main = struct
     |h :: t -> let ar = array_getter h in
       let () = array.(acc) <- ar in array_updater t array (acc+1)
 
-  (** TODO: DOCUMENT *)
-  and eval_mlet_defn id e env =
-    let lst_of_arrays = eval_row_id_list e env in
-    let column_length = List.nth lst_of_arrays 0
-                        |> array_getter
-                        |> Array.length in
-    let array = Array.make_matrix  (List.length e) column_length 0. in
-    let array' = VMatrix (array_updater lst_of_arrays array 0) in
-    let env' = Env.add id array' env in
-    (array', env')
 
-  (** TODO: DOCUMENT *)
-  and eval_mrow x lst curr_env =
-    let a = eval_id_list lst curr_env in
-    let a' = values_to_floats a in
-    let array = Array.make (List.length a') 0. in
-    let () = for i = 0 to ((List.length a') - 1) do
-        array.(i) <- List.nth a' i
-      done in
-    let env = Env.add x (VRow array) curr_env in
-    (VRow array, env)
 
   and eval_let_defn (env1:env) id e =
     let v = step env1 e  in
@@ -283,11 +263,6 @@ module Main = struct
     |[] -> []
     |e :: t -> ( float_getter (step env e)) :: (eval_id_lst_flts t env)
 
-  (** TODO: DOCUMENT *)
-  and eval_slet id e env =
-    let vlst = (VFloatList (eval_id_lst_flts e env)) in
-    let env' = Env.add id vlst env in
-    (vlst, env')
 
   and eval_row lst curr_env =
     let a = eval_id_list lst curr_env in
@@ -345,7 +320,8 @@ module Main = struct
   let time_helper tm =
     let tm' = Unix.localtime tm in
     let () = printf "Date -  %s %s %d, %d \n"
-        days.(tm'.tm_wday) months.(tm'.tm_mon) tm'.tm_mday (tm'.tm_year + 1900) in
+        days.(tm'.tm_wday) months.(tm'.tm_mon) 
+        tm'.tm_mday (tm'.tm_year + 1900) in
     let () = printf "Time -  %02d:%02d:%02d"
         tm'.tm_hour tm'.tm_min tm'.tm_sec in ()
 
@@ -373,7 +349,8 @@ module Main = struct
     match String.trim (String.lowercase_ascii (read_line())) with
     |"quit" -> ()
     |"clear" -> let _ = Unix.system "clear"in main () curr_env
-    |"help" -> let chnl = open_in "help.txt" in help_command_helper chnl; main () curr_env
+    |"help" -> let chnl = open_in "help.txt" in 
+      help_command_helper chnl; main () curr_env
     |"time" -> let tm = Unix.time() in
       time_helper tm;print_endline (""); main () curr_env
     |"monty hall game"-> let () = Monty.start() in main() curr_env
@@ -383,13 +360,16 @@ module Main = struct
     |e ->
 
       try (
-        if (((String.length e) > 5) && ((String.sub e ((String.length e) - 4) (4)) = ".txt") ) then
+        if (((String.length e) > 5) && 
+            ((String.sub e ((String.length e) - 4) (4)) = ".txt") ) then
           let chnl = open_in e in 
           let env' =  code_file_reader chnl curr_env in 
           main() env'
         else
           match (interp e curr_env) with
-          |exception Not_found -> print_endline "Not a valid command please try again"; main () curr_env
+          |exception Not_found -> 
+            print_endline "Not a valid command please try again";
+            main () curr_env
           |(s, env) -> print_endline s;
             print_endline "";
             main () env)

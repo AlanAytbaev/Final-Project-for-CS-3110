@@ -10,7 +10,6 @@ module type MySet_Funcs = sig
   val difference : value list -> value
   val append_val : value list -> value
   val remove : value list -> value
-  val remove_element : value list -> value
   val length : value list -> value
   val get_element : value list -> value
 end
@@ -37,7 +36,8 @@ module MySet_Functions : MySet_Funcs = struct
   let rec helper short long acc =
     match acc with
     |0 -> []
-    |i -> let v = long.(i-1) in if (Array.mem v short) then v :: helper short long (acc -1 ) else  helper short long (acc -1 )
+    |i -> let v = long.(i-1) in if (Array.mem v short) 
+      then v :: helper short long (acc -1 ) else  helper short long (acc -1 )
 
 
 
@@ -97,31 +97,16 @@ module MySet_Functions : MySet_Funcs = struct
             |> Array.of_list)
     | _ -> failwith "InvalidInput"
 
-  let rec remove_helper (fl : float list) (rv : float) =
-    match fl with
-    | [] -> []
-    | hd :: tl -> if hd == rv then tl else hd :: (remove_helper tl rv)
+  let rec remove_helper v l = 
+    List.filter (fun x -> x<>v) l
 
-  let remove (v : value list) =
-    match v with
-    | hd1::hd2::tl ->
-      let (hd1', hd2') = ((hd1 |> unwrap_row |> Array.to_list), unwrap_float hd2) in
-      VRow ((remove_helper hd1' hd2')
-            |> Array.of_list)
-    | _ -> failwith "InvalidInput"
-
-  let rec remove_element_helper (fl : float list) (rv : float) =
-    match fl with
-    | [] -> []
-    | hd :: tl -> if rv == 0.0 then tl else hd :: (remove_helper tl (rv -. 1.0))
-
-  let remove_element (v : value list) =
-    match v with
-    | hd1::hd2::tl ->
-      let (hd1', hd2') = ((hd1 |> unwrap_row |> Array.to_list), unwrap_float hd2) in
-      VRow ((remove_element_helper hd1' hd2')
-            |> Array.of_list)
-    | _ -> failwith "InvalidInput"
+  let remove (v: value list) = 
+    match v with 
+    |h1::h2::[] ->
+      let v = h1 |> unwrap_row |>Array.to_list |> remove_helper (unwrap_float h2) 
+              |> Array.of_list in 
+      VRow v
+    | _ -> failwith "Invalid Input"
 
   let length (v : value list) =
     match v with
@@ -134,8 +119,12 @@ module MySet_Functions : MySet_Funcs = struct
 
   let get_element (v : value list) =
     match v with
-    | hd1::hd2::tl -> let (hd1', hd2') = ((hd1 |> unwrap_row |> Array.to_list), unwrap_float hd2) in
-      VFloat (List.nth hd1' (int_of_float hd2'))
+    | hd1::hd2::tl -> 
+      let (hd1', hd2') = 
+        ((hd1 |> unwrap_row |> Array.to_list), unwrap_float hd2) in
+      if(int_of_float hd2' >= List.length hd1') 
+      then failwith "Please enter a valid index"
+      else VFloat (List.nth hd1' (int_of_float hd2'))
     | _ -> failwith "InvalidInput"
 end
 
@@ -149,7 +138,6 @@ module MySet_CFU  = struct
     ("remove_val", MySet_Functions.remove);
     ("length", MySet_Functions.length);
     ("get_elem", MySet_Functions.get_element);
-    ("remove_elem", MySet_Functions.remove_element)
   ]
 
 end
