@@ -357,6 +357,18 @@ module Main = struct
     |"monty hall explanation" -> let chnl = open_in "monty_explain.txt" in
       text_file_reader chnl; main() curr_env
     |"break the code game" -> let () = Breakthecode.start() in main () curr_env
+    |"statistics help" -> let chnl = open_in "statistics_help.txt" in 
+      text_file_reader chnl; main() curr_env
+    |"fibonacci help" -> let chnl = open_in "fibonacci_help.txt" in 
+      text_file_reader chnl; main() curr_env
+    |"code files help" -> let chnl = open_in "code_files_help.txt" in 
+      text_file_reader chnl; main() curr_env
+    |"matrix help" -> let chnl = open_in "matrix_help.txt" in 
+      text_file_reader chnl; main() curr_env
+    |"sets help" -> let chnl = open_in "sets_help.txt" in 
+      text_file_reader chnl; main() curr_env
+    |"graphing help" -> let chnl = open_in "graphing_help.txt" in 
+      text_file_reader chnl; main() curr_env
     |e ->
 
       try (
@@ -490,5 +502,7 @@ module Main = struct
        |> Env.add "matrix" (Extern (MExtFun (eval_matrix))))
 
   let run = fun () ->
+    print_string [magenta] 
+      "Welcome to CAMLCALC...type \"help\" if you are unsure of where to begin\n";
     main () (initial_env)
 end

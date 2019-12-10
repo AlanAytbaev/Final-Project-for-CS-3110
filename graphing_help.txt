@@ -1,0 +1,11 @@
+Graphing Help:
+
+In order to graph a function, you need to define it according to the function 
+definition rule: (let <function name> = fun ( <argument list> ) -> <function body>).
+ex.
+let f = fun (x) -> x*x
+
+Then in order to graph the function, type in 
+"graph <function name> <lower bound> <upper bound>"
+ex. 
+graph f -10 10
