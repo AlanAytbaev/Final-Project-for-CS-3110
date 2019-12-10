@@ -89,7 +89,8 @@ module Trigonometric_Functions : Trigonometric_Funcs = struct
 
   let cotan (f : value list) =
     match f with
-    | hd :: tl -> if (int_of_float (unwrap hd) mod 90 = 0 && int_of_float (unwrap hd) mod 180 <> 0) then (VFloat 0. )
+    | hd :: tl -> if (int_of_float (unwrap hd) mod 90 = 0 &&
+                      int_of_float (unwrap hd) mod 180 <> 0) then (VFloat 0. )
       else if ( int_of_float (unwrap hd) mod 180 = 0) then failwith "undefined"
       else let x = deg_to_rad [hd] |> unwrap in
         (VFloat (Float.div 1. (Float.tan x)))

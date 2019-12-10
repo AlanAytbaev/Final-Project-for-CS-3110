@@ -35,14 +35,10 @@ parse
 |"cot" { COT }
 |"==" { EQUALS }
 |";" { SEMI }
-|";;" {DOUBLE_SEMI}
 |"if" { IF }
 |"then" { THEN }
 |"else" { ELSE }
 |"let" { LET }
-|"rlet" { RLET }
-|"mlet" { MLET }
-|"slet" { SLET }
 |"=" { EQUALS }
 |"in" { IN }
 |"fun" {FUN}
