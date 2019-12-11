@@ -1,8 +1,5 @@
 open Ast
 
-(** A module that implements the functions needed for the arithmetic cfu.
-    A module that matches [Arithmetic_Funcs] is suitable for use in
-    [Arithmetic_CFU]. *)
 module type Arithmetic_Funcs = sig
   val add : value list -> value
   val subtract : value list -> value
@@ -15,11 +12,7 @@ module type Arithmetic_Funcs = sig
 end
 
 module type CFU_sig = sig
-  (** An [operation_list] is an association list that maps operation symbols
-      to functions *)
   val operation_list : (string * ( value list -> value )) list
-  (** [find s] is the operation that is associated with [s] in the operation
-      list *)
 end
 
 module Arithmetic_Functions : Arithmetic_Funcs = struct

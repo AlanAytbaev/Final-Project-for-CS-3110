@@ -33,6 +33,19 @@ module type MySet_Funcs = sig
 
   val get_element : value list -> value
 
+  (** [isEqual x y] is true if two sets contain structurally 
+       equal elements and have the same number of elements and 
+       is false otherwise*)
+  val isEqual : value list -> value 
+
+  (** [isSubset x y] is true is x is a subset of y, false otherwise *)
+  val isSubset : value list -> value 
+
+  (** [isDisjoint x y] is true if none of the elements in [x] are
+      in [y] and is false otherwise*)  
+  val isDisjoint : value list -> value 
+
+
 end
 
 module MySet_Functions : MySet_Funcs

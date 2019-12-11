@@ -11,7 +11,9 @@ module type MySet_Funcs = sig
   val append_val : value list -> value
   val remove : value list -> value
   val length : value list -> value
-  val get_element : value list -> value
+  val get_element : value list -> value val isEqual : value list -> value
+  val isSubset :value list -> value
+  val isDisjoint : value list -> value
 end
 
 module MySet_Functions : MySet_Funcs = struct
@@ -126,6 +128,49 @@ module MySet_Functions : MySet_Funcs = struct
       then failwith "Please enter a valid index"
       else VFloat (List.nth hd1' (int_of_float hd2'))
     | _ -> failwith "InvalidInput"
+  (** [unwrap_float v] is the float extracted from value [v] *)
+
+  (** [check_elements_helper x y int bool] checks whether every element in x is present in y and
+       returns [bool] true if so and false if otherwise *)
+  let rec check_elements_helper x y int bool= 
+    match int with 
+    |0 -> bool
+    |i -> if (Array.mem x.(i-1) y)
+      then check_elements_helper x y (i-1) (true&&bool) 
+      else false
+
+  (** [isEqual_helper x y] is true if two sets contain structurally 
+      equal elements and have the same number of elements and 
+      is false otherwise*)
+  let isEqual_helper x y =
+    if (Array.length x = Array.length y) then 
+      check_elements_helper x y (Array.length x) true
+    else false
+
+  let isEqual v = 
+    let s1 = List.nth v 0 |> unwrap_row in 
+    let s2 = List.nth v 1 |> unwrap_row in 
+    VBool (isEqual_helper s1 s2)
+
+  (** [isSubset x y] returns true if all elements in [x] is also there in [y] *)
+  let isSubset v = 
+    let s1 = List.nth v 0 |> unwrap_row in 
+    let s2 = List.nth v 1 |> unwrap_row in 
+    VBool(check_elements_helper s1 s2 (Array.length s1) true)
+
+  let rec check_elements_helper_2 x y int bool= 
+    match int with 
+    |0 -> bool
+    |i -> if (Array.mem x.(i-1) y) 
+      then  false
+      else check_elements_helper_2 x y (i-1) (true&&bool) 
+
+  (** [isDisjoint x y] returns true if none of the elements in [x] are
+      in [y] and returns false otherwise*)
+  let isDisjoint v = 
+    let s1 = List.nth v 0 |> unwrap_row in 
+    let s2 = List.nth v 1 |> unwrap_row in 
+    VBool (check_elements_helper_2 s1 s2 (Array.length s1) true)
 end
 
 module MySet_CFU  = struct
@@ -138,6 +183,9 @@ module MySet_CFU  = struct
     ("remove_val", MySet_Functions.remove);
     ("length", MySet_Functions.length);
     ("get_elem", MySet_Functions.get_element);
+    ("is_equal", MySet_Functions.isEqual);
+    ("is_disjoint", MySet_Functions.isDisjoint);
+    ("is_subset", MySet_Functions.isSubset);
   ]
 
 end
