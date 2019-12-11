@@ -1,6 +1,24 @@
 open OUnit2
 open Ast
 open Main
+(** Test Plan: For our test cases, we used OUnit to test most of our 
+      mathematical functions in our CFUs and we used OUnit to test language 
+      features. However, there were some parts of our calculator that we could
+      not test with OUnit, which we tested interactively due to these being 
+      difficult to develop test cases for. These parts that we tested 
+      interactively were the graphing and user defined functions. 
+      The OUnit tests we wrote were developed using black box testing and 
+      we made sure to cover all edge cases. Our testing plan proves our system 
+      correctness because by passing these test cases, it proves all of our 
+      mathematical functions in our CFU's are correct, and it also proves our 
+      calculator language features are correct. For user defined functions and 
+      graphing, we tested these interactively. We had to do so 
+      because the graphing function we wrote output graphs to an image file. Our 
+      interactive testing proves our graphing is correct because we compared 
+      the graphs that we generated to graphs we generated on other graphing
+      calculators and they looked exactly the same.
+      Overall, our testing plan proves the correctness of our system 
+      because it makes sure every small part of it works as intended. *)
 
 (** [make_i n i s] makes an OUnit test named [n] that expects
     [s] to evalute to [Float i]. *)
@@ -9,7 +27,6 @@ let make_i n i s =
       assert_equal i (fst (Main.interp s Main.initial_env)) 
         ~printer:(fun x-> x))
 
-(* Add Tests Below Here *)
 let tests = [
   make_i "float" "22." "22";
   make_i "add" "22." "11+11";
@@ -300,6 +317,28 @@ let tests = [
   make_i "matrices - rref7" "[|1.|]"
     "let matr = matrix [1] in let m = rref matr in m";
 
+  make_i "derivatives" "10.01" "let f = fun (x) -> x*x in deriv f 5 0.01";
+  make_i "derivatives2" "0.01" "let f = fun (x) -> x*x in deriv f 0 0.01";
+  make_i "derivatives3" "2." "let f = fun (x) -> 2*x in deriv f 9 0.01";
+  make_i "derivatives4" "0." "let f = fun (x) -> 2 in deriv f 4 0.01";
+  make_i "derivatives5" "16.01" 
+    "let f = fun (x) -> x*x+2*x+3 in deriv f 7 0.01";
+  make_i "derivatives6" "12.0601" 
+    "let f = fun (x) -> (x*x*x)+5 in deriv f 2 0.01";
+  make_i "derivatives7" "0." 
+    "let f = fun (x) -> 0*x in deriv f 100 0.01";
+
+  make_i "integral" "330.68" "let f = fun (x) -> x*x in integ f 2 10";
+  make_i "integral" "24." "let f = fun (x) -> 2*x in integ f 1 5";
+  make_i "integral" "3.7575" "let f = fun (x) -> x*x*x in integ f 1 2";
+  make_i "integral" "0." "let f = fun (x) -> x*0 in integ f 1 2";
+  make_i "integral" "6." "let f = fun (x) -> 6 in integ f 1 2";
+  make_i "integral" "23750." "let f = fun (x) -> x in integ f 450 500";
+
+  make_i "eigenvector" "[|-1., -0.5|\n |1., 1.|]" 
+    "let a = matrix [0 1] [-2 -3] in let eig = [-1 -2] in eigenvectors a eig ";
+  make_i "eigenvector2" "[|1., 1.|\n |1., 1.|]" 
+    "let m = midentity 2 in let eig = [1 1] in eigenvectors m eig"
 
 
 ]

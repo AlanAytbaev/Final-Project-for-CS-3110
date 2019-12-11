@@ -9,9 +9,6 @@ module type CFU_sig = sig
       symbols to functions *)
   val operation_list : (string * ( value  list -> value )) list
 
-  (** [find s] is the operation that is associated with [s] in the operation
-      list *)
-  val find_function : string -> (value list -> value)
 end
 
 
@@ -45,6 +42,13 @@ module type Trigonometric_Funcs = sig
   val cotan : value list -> value
 
 end
-
+(** [Trigonometric_Functions] implements the function values defined in 
+    [Trigonometric_Funcs]. This module contains the Trigonometric 
+    functionalities of CAMLCALC
+*)
 module Trigonometric_Functions : Trigonometric_Funcs
+
+(** [Trigonometric_CFU] is a module of type [CFU_sig] that contains the 
+    [operation_list] which maps the operation symbols to the Trigonometric 
+    Functions *)
 module Trigonometric_CFU : CFU_sig

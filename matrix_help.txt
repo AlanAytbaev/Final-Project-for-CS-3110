@@ -27,7 +27,24 @@ doesn't have to
 
 - Row Echelon Form Reduction ("echelon")
 - Reduced Row Echelon Form Reduction ("rref")
+- Determinant ("determinant")
 
 These functions both take in one matrix as an argument and return the echelon 
-form or the reduced row echelon form of that matrix
+form, the reduced row echelon form or the determinant of that matrix accordingly
+
+- Eigenvectors ("eigenvectors")
+This function takes in two arguments, the matrix and the row of eigenvalues.
+In order to calculate eigenvectors, define a matrix as explained
+above and define the known set of eigenvectors as a row. Then pass them in as 
+the arguments to this function
+
+ex. 
+let a = matrix [0 1] [-2 -3] 
+let eig = [-1 -2]
+eigenvectors a eig
+
+or
+
+let a = matrix [0 1] [-2 -3] in let eig = [-1 -2] in eigenvectors a eig
+
 

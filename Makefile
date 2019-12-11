@@ -1,11 +1,12 @@
-MODULES=lexer parser arithmetic main statistics matrix trigonometric myset fibonacci
-OBJECTS=$(MODULES:=.cmo)
-MLS=$(MODULES:=.ml)
-MLIS=$(MODULES:=.mli)
+UNITS=arithmetic main statistics matrix trigonometric myset fibonacci authors breakthecode monty imports
+MLS_WITHOUT_MLIS=ast
+MLS=$(UNITS:=.ml) $(MLS_WITHOUT_MLIS:=.ml)
+OBJECTS=$(UNITS:=.cmo) $(MLS_WITHOUT_MLIS:=.cmo) parser.cmo
+MLIS=$(UNITS:=.mli)
 TEST=test.byte
 MAIN=main.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind -use-menhir
-PKGS=unix.oUnit
+PKGS=oUnit
 
 default: build
 	utop
@@ -18,6 +19,7 @@ test:
 
 clean:
 	ocamlbuild -clean
+	rm -rf doc.public doc.private calculator.zip _build
 	
 calc:
 	$(OCAMLBUILD) calc.byte && ./calc.byte

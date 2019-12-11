@@ -1,6 +1,5 @@
 open Ast
 open Stdlib
-open ANSITerminal
 open Lexing
 open Printf
 open Imports
@@ -13,7 +12,7 @@ end
 
 module Main = struct
 
-  (**Exceptions *)
+  (** Exceptions for errors in parsing phrases input by the user *)
   exception SyntaxError of string
   exception UnexpectedError of string
 
@@ -25,33 +24,31 @@ module Main = struct
   let unexp_err lexbuf = raise
       (UnexpectedError "Unexepcted error, please try again")
 
-
+  (** [parse parser_start s] parses [s] as a phrase using [parser_start] *)
   let parse parser_start s =
     let lexbuf = from_string s in
     try parser_start Lexer.read lexbuf with
     | Parser.Error | Lexer.Syntax_error -> parse_error lexbuf
     | Failure s -> unexp_err s
 
-
+  (** [parse_phrase s] parses [s] as a phrase *)
   let parse_phrase = parse Parser.prog
 
+  (** [return_head lst] is the first element of [lst] *)
   let return_head = function
     |h::t -> h
     | _ -> failwith "This case is not reached"
 
-  let rec helper_expr_to_float = function
-    |[] -> []
-    |VFloat f:: t -> f:: helper_expr_to_float t
-    | _ -> failwith "not right type of argument"
 
-  (** [helper_expr_to_float lst] is the float list representation
-      of [lst] is all values of [lst] are floats *)
+  (** [values_to_float lst] is the float list representation of [lst]
+      Requires: all elements in [lst] are of type VFloat *)
   let rec values_to_floats = function
     |[] -> []
     |VFloat f :: t -> f :: values_to_floats t
     | _ -> failwith "not right type of argument"
 
-  (** TODO: DOCUMENT *)
+  (** [string_of_floatlst lst] is the string representation of [lst]
+      Requires: all elements of [lst] are floats *)
   let rec string_of_floatlst lst =
     match lst with
     |[] -> ""
@@ -59,7 +56,8 @@ module Main = struct
         string_of_float h ^"" ^ string_of_floatlst t else
         string_of_float h ^", " ^ string_of_floatlst t
 
-  (** TODO: DOCUMENT *)
+  (** [matrix_to_string_helper lst fst_element] is the string representation
+      of each row of the matrix [lst] *)
   let rec matrix_to_string_helper lsts fst_element=
     match lsts with
     |[] -> ""
@@ -69,7 +67,7 @@ module Main = struct
         "\n |"^ string_of_floatlst h ^"|" ^
         matrix_to_string_helper t fst_element
 
-  (** TODO: DOCUMENT *)
+  (** [matrix_to_string m] is the string representation of the matrix [lst] *)
   let matrix_to_string m =
     let lst = Array.to_list (Array.map Array.to_list m) in
     let s = "["^ (matrix_to_string_helper lst (List.nth lst 0))^ "]"in s
@@ -92,6 +90,8 @@ module Main = struct
     |Unop _ -> "unop"
     |Arr _ -> "arr"
 
+
+  (** [string_of_value v] is the string representation of value [v] *)
   let string_of_value  = function
     |VBool b -> string_of_bool b
     |VFloat s -> string_of_float s
@@ -107,19 +107,15 @@ module Main = struct
     |VFloatList _ -> "float list values"
     |VMatrix m -> matrix_to_string m
 
-  let load_file f env =
-    let ic = open_in f in
-    let n = in_channel_length ic in
-    let s = Bytes.create n in
-    really_input ic s 0 n;
-    close_in ic;
-    (Bytes.unsafe_to_string s)
-
+  (** [unwrap v] is the float extracted from value [v] 
+        Requires: [v] has type VFloat *)
   let unwrap_float v =
     match v with
     | VFloat x -> x
     | _ -> failwith "This cannot occur - arithmetic.ml"
 
+  (** [step env expr] is the [value] where [expr] steps to [value] when 
+      evaluated in environment [env] *)
   let rec step (curr_env:env) expr =
     match expr with
     | Float x -> VFloat (x)
@@ -137,11 +133,15 @@ module Main = struct
     | Unop (unop, e) -> eval_unop unop e curr_env
     | Arr (e) -> fst (eval_row e curr_env)
 
+  (** [eval_unop up e env] is the [value] that [up] [e] evaluates to in 
+      environment [env] *)
   and eval_unop uop e env =
     let v = step env e in
     match uop, v with
     |Func_u str, v1 -> (Imports.find_function str) [v1]
 
+  (** [eval_if e1 e2 e3 env] is the [value] that is the result of evaluating
+      if [e1] then [e2] else [e3] in environment [env] *)
   and eval_if e1 e2 e3 env =
     let v = step env e1 in
     match v with
@@ -150,8 +150,9 @@ module Main = struct
     |VFloat f -> if f = 1. then step env e2 else step env e3
     | _ -> failwith "if guard error"
 
-  (** [step_bop bop v1 v2] implements the primitive operation
-      [v1 bop v2].  Requires: [v1] and [v2] are both values. *)
+  (** [step_bop bop e1 e2 env] is the [value] of the evaluation of  the 
+      primitive operation [v1 bop v2] in environment [env]
+      Requires: [v1] and [v2] are both values. *)
   and step_bop bop e1 e2 env =
     let e1' = step env e1 in
     let e2' = step env e2 in
@@ -159,16 +160,22 @@ module Main = struct
     | Func str, v1, v2 ->
       (Imports.find_function str) [v1;v2]
 
+  (** [string_of_var e] is the string extracted from [e]
+      Requires: [e] is of type [Var] *)
   and string_of_var e = match e with
     | Var e -> e
     |_ -> failwith "not vaild identifier for let statement"
 
+  (** [eval_let_expr env x e1 e2] is the [value] that is the result of 
+      evaluating let [x] = [e1] in [e2] in environment [env] *)
   and eval_let_expr env x e1 e2 =
     let v1 = step env e1  in
     let env' = Env.add x v1 env in
     let v = step env' e2 in v
 
-
+  (** [eval_fun e1 e2 env] is the [value] resulting from evaluating 
+      [e1] to a [Closure] or [Extern] and applying that value to [e2] within
+      environment [env] *)
   and eval_fun e1 e2 env =
     let v' = step env e1  in
     match v' with
@@ -193,17 +200,16 @@ module Main = struct
       (g v2 env)
     |_-> failwith "function failure"
 
+
+  (** [eval_id_list e2 env] is the [value] list where each expression in [e2] 
+      was stepped within environment [env] t *)
   and eval_id_list e2 env =
     match e2 with
     |[] -> []
     |e :: t -> (step env e ):: (eval_id_list t env)
 
-  (** TODO: DOCUMENT *)
-  and eval_id_list_floats e2 env =
-    match e2 with
-    |[] -> []
-    |e :: t -> (step env (e )):: (eval_id_list_floats (t) env)
-
+  (** [add_bindings ids values env] is the [env] with the [values] bound 
+      to [ids] *)
   and add_bindings ids values env =
     match (ids, values) with
     | ([], []) -> env
@@ -211,59 +217,61 @@ module Main = struct
       add_bindings idt vt env'
     | _ -> env
 
+  (** [eval_seq e1 e2 env] is the [value] that [e2] steps to in environment 
+      [env] after evaluating [e2]  *)
   and eval_seq e1 e2 curr_env = 
     let _ = step curr_env e1 in 
     step curr_env e2
 
+  (** [eval_dseq d e env] is the [value] that [e] steps to in environment 
+        [env'] after evaluating [d] to [(v, env')] *)
   and eval_dseq d e cur_env = 
     let (v , env') = eval_defn cur_env d in 
     step env' e
 
-  (** [eval_defn env e] is the (v, env') where [v] is such that
-      [<env, e> ==> <v, env'>]. *)
+  (** [eval_defn env e] evaluates [e] to [(v, env')] in environment [env] *)
   and eval_defn env e = 
     match e with
     |DLet (id, e1) -> eval_let_defn env id e1
 
-  (** TODO: DOCUMENT *)
+  (** [eval_row_id_list lst env] is the [value] list representation of [lst] 
+      in environment [env] 
+      Requires: all elements in [lst] are of type [Var] *)
   and eval_row_id_list lst env =
     match lst with
     |[] -> []
     |h :: t -> let h = Var h in (step env h) :: (eval_row_id_list t env)
 
-  (** TODO: DOCUMENT *)
+  (** [array_getter e] is the float array extracted from [e]
+      Requires: [e] is of type [VRow] *)
   and array_getter e =
     match e with
     |VRow e -> e
     |_ -> failwith "wrong type of arguement"
 
-  (** TODO: DOCUMENT *)
-  and array_updater lst array acc =
-    match lst with
-    |[] -> array
-    |h :: t -> let ar = array_getter h in
-      let () = array.(acc) <- ar in array_updater t array (acc+1)
-
-
-
-  and eval_let_defn (env1:env) id e =
+  (** [eval_let_defn env id e] is the [(v,env')] after evaluating [e] to [v] 
+      and adding [id] bound to [v] to [env] creating [env'] *)
+  and eval_let_defn env1 id e =
     let v = step env1 e  in
     let env' = Env.add id v env1 in
     (v, env')
 
-  (** TODO: DOCUMENT *)
+  (** [float_getter v] returns v1 if [v] is VFloat v1. Fails with "invalid 
+      argument" otherwise. *)
   and float_getter v =
     match v with
     |VFloat v -> v
     |_ -> failwith "invalid argument"
 
-  (** TODO: DOCUMENT  - duplicate function??? *)
+  (** [eval_id_lst_flts lst env] is a list of floats by evaluating each element
+      in [lst] within the current environment [curr_env] *)
   and eval_id_lst_flts lst env =
     match lst with
     |[] -> []
     |e :: t -> ( float_getter (step env e)) :: (eval_id_lst_flts t env)
 
-
+  (** [eval_row lst curr_env] evaluates [lst] to a CAMLCALC Row type within the
+      current environment [curr_env] *)
   and eval_row lst curr_env =
     let a = eval_id_list lst curr_env in
     let a' = values_to_floats a in
@@ -273,6 +281,8 @@ module Main = struct
       done in
     (VRow array, curr_env)
 
+  (** [eval_matrix lst curr_env] evaluates [lst] to a CAMLCALC Matrix within the
+      environment [curr_env] *)
   and eval_matrix (lst : value list) (curr_env : env) =
     let _column_length = match List.hd lst with
       | VRow v -> Array.length v
@@ -289,6 +299,7 @@ module Main = struct
     in
     VMatrix a
 
+  (** [eval_phrase env exp] evaluates [exp] within the environment [env] *)
   let rec eval_phrase env exp =
     match exp with
     |Expr e -> (step env e, env)
@@ -325,18 +336,18 @@ module Main = struct
     let () = printf "Time -  %02d:%02d:%02d"
         tm'.tm_hour tm'.tm_min tm'.tm_sec in ()
 
-  let rec help_command_helper chnl =
-    match input_line chnl with
-    |s -> print_endline s; help_command_helper chnl
-    |exception End_of_file -> close_in chnl
 
-  (** DOCUMENT THIS *)
+  (** [text_file_reader chnl] reads line by line and prints it out from 
+        [chnl] until [End_of_file] is reached *)
   let rec text_file_reader chnl =
     match input_line chnl with
     |s -> print_endline s; text_file_reader chnl
     |exception End_of_file -> close_in chnl
 
-
+  (** [code_file_reader chnl env] reads from [chnl] line by line, interpreting 
+      each line in CAMLCALC, printing each line and result. Returns [env'] 
+      which is the updated environment after [End_of_file] was reached
+       in [chnl] *)
   let rec code_file_reader chnl env =
     match input_line chnl with
     |s -> print_endline s;let r = interp s env in
@@ -345,12 +356,12 @@ module Main = struct
 
 
   let rec main () curr_env =
-    ANSITerminal.print_string [red] ">";
+    print_string ">";
     match String.trim (String.lowercase_ascii (read_line())) with
     |"quit" -> ()
     |"clear" -> let _ = Unix.system "clear"in main () curr_env
     |"help" -> let chnl = open_in "help.txt" in 
-      help_command_helper chnl; main () curr_env
+      text_file_reader chnl; main () curr_env
     |"time" -> let tm = Unix.time() in
       time_helper tm;print_endline (""); main () curr_env
     |"monty hall game"-> let () = Monty.start() in main() curr_env
@@ -387,10 +398,13 @@ module Main = struct
             main () env)
 
       with
+      |Failure s -> print_endline "Not a valid command please try again"; 
+        main () curr_env
       |Invalid_argument e ->
         print_endline "Not a valid command please try again"; main () curr_env
 
-  (**BEGIN Externs *)
+
+  (**[graph] *)
   let graph (c, left_bound, right_bound, env) =
     let (ids, f, env') =
       match c with
@@ -419,6 +433,9 @@ module Main = struct
         (Sys.command "xdg-open fig.png");
     Boolean true
 
+  (** [derivative_helper c x1_val h_val] calculates the derivative of [c] at 
+      [x1_val] with an approximation of [h_val]. Returns error if [c] is not a 
+      closure *)
   let derivative_helper (c : value) (x1_val : value) (h_val : value) =
     let (ids, expr, env) =
       match c with
@@ -433,12 +450,19 @@ module Main = struct
     let y2 = step env (FunApp (f,[Float x2])) |> unwrap_float in
     (Float.div (Float.sub y2 y1) (h_val |> unwrap_float ))
 
+  (** [derivative v] calculates the derivative of the first element of [v] at
+      a point given by the second element of [v] and with an approximation given
+      by the third element of [v] 
+      Requires: [v] is of length = 3 and is of ordered types function, float, 
+      float *)
   let derivative (v : value list) =
     let c = List.nth v 0 in
     let x1_val = List.nth v 1 in
     let h_val = List.nth v 2 in
     VFloat (derivative_helper c x1_val h_val)
 
+  (** [trapezoid c v v1] calculates the trapezoidal integral approximation of
+      [c] from [v] to [v1]. *)
   let trapezoid (c : value) (v : float) (v1 : float) =
     let (ids, expr, env) =
       match c with
@@ -452,6 +476,8 @@ module Main = struct
       (Float.mul 0.5 (Float.add (left_height) (right_height)))
       (Float.sub v1 v)
 
+  (** [integrate_helper f v v1 acc] is the result of integrating f and 
+      evaluating it from [v] to [v1]. *)
   let rec integrate_helper
       (f : value) (v : float) (v1 : float) (acc : float) =
     if v > (v1 -. 0.09) && v < (v1 +. 0.09) then
@@ -469,6 +495,11 @@ module Main = struct
         v1
         (Float.add acc (trapezoid f v (Float.add v (- 0.1))))
 
+  (** [integrate v] integrates the first element in [v] from lower bound to 
+      upper bound where lower bound is the second element of [v] and upper 
+      bound is the third element of [v]
+      Requires: [v] is of length = 3 and elements should be in order of types
+      function, float, float *)
   let integrate (v : value list) =
     VFloat (integrate_helper
               (List.nth v 0)
@@ -476,12 +507,12 @@ module Main = struct
               (List.nth v 2 |> unwrap_float)
               (0.0))
 
+  (** [unwrap_string v] is s if [v] is String of s. Fails with "Type error, 
+      expected string " otherwise *)
   let unwrap_string v =
     match v with
     | String s -> s
-    | _ -> failwith "Type error, expected string - main.ml"
-
-  (**END Externs *)
+    | _ -> failwith "Type error, expected string"
 
   let initial_env =
 
@@ -502,7 +533,7 @@ module Main = struct
        |> Env.add "matrix" (Extern (MExtFun (eval_matrix))))
 
   let run = fun () ->
-    print_string [magenta] 
+    print_string
       "Welcome to CAMLCALC...type \"help\" if you are unsure of where to begin\n";
     main () (initial_env)
 end

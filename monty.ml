@@ -1,5 +1,5 @@
 open Stdlib
-open ANSITerminal
+
 
 (** type for the doors *)
 type door = Car | Goat
@@ -67,7 +67,7 @@ let find_car triple =
 let state_printer st = 
   match st with 
   |{choice = c; doors = d; item = i; switched = s} -> 
-    print_string [cyan] (c ^", doors perm, " ^ (string_of_door i) ^ ", " ^ s) 
+    print_string (c ^", doors perm, " ^ (string_of_door i) ^ ", " ^ s) 
 
 
 (** [choice d perm] is the item ([Goat] or [Car]) behind the user's choice [d]
@@ -77,7 +77,7 @@ let rec choice d perm =
   |"A" -> fst perm
   |"B" -> snd perm
   |"C"-> thrd perm
-  |_ -> print_string [cyan] "Invalid door choice, please try again"; 
+  |_ -> print_string  "Invalid door choice, please try again"; 
     let () = start () in fst perm 
 
 (** [play1 ch] is the [game_state] after the user has chosen door [ch]
@@ -86,63 +86,62 @@ and play1 ch =
   try(
     let perm = permutation in
     let fst_item = choice ch perm in 
-    set_autoreset true;
     match ch with 
     |"A" as d -> if (fst_item = Goat) then (
         if ((snd perm) = Goat) then
-          let () = print_string [cyan] 
+          let () = print_string
               "I will open door B\nBehind door B is A Goat" in 
           {choice = d; doors = perm; item = fst_item; switched = "B"}
         else
-          let () = print_string [cyan]
+          let () = print_string 
               "\nI will open door C\nBehind door C is a Goat" 
           in {choice = d; doors = perm; item = fst_item; switched = "C"})
       else (
         let x = Random.int 2 in 
         if x = 1 then 
-          let () = print_string [cyan]
+          let () = print_string
               "I will open door B\nBehind door B is a Goat" in 
           {choice = d; doors = perm; item = fst_item; switched = "B"}
         else 
-          let () = print_string [cyan] 
+          let () = print_string 
               "\nI will open door C\nBehind door C is a Goat" 
           in {choice = d; doors = perm; item = fst_item; switched = "C"})
 
     |"B" as d -> if fst_item = Goat then begin
         if ((fst perm) = Goat) then 
-          let () = print_string [cyan]
+          let () = print_string
               "I will open door A\nBehind door A is a Goat" in 
           {choice = d; doors = perm; item = fst_item; switched = "A"}
         else 
-          let () = print_string [cyan]
+          let () = print_string 
               "\nI will open door C\nBehind door C is a Goat" 
           in {choice = d; doors = perm; item = fst_item; switched = "C"} end
       else begin
         let x = Random.int 2 in if x = 1 then 
-          let () = print_string [cyan] 
+          let () = print_string 
               "I will open door A\nBehind door A is a Goat" in 
           {choice = d; doors = perm; item = fst_item; switched = "A"}
         else 
-          let () = print_string [cyan] 
+          let () = print_string  
               "\nI will open door C\nBehind door C is a Goat" 
           in {choice = d; doors = perm; item = fst_item; switched = "C"}
       end
     |"C" as d -> if fst_item = Goat then begin
         if ((fst perm) = Goat) then 
-          let () = print_string [cyan] 
+          let () = print_string 
               "I will open door A\nBehind door A is a Goat" in 
           {choice = d; doors = perm; item = fst_item; switched = "A"}
         else 
-          let () = print_string [cyan]
+          let () = print_string
               "\nI will open door B\nBehind door B is a Goat " 
           in {choice = d; doors = perm; item = fst_item; switched = "B"} end
       else begin
         let x = Random.int 2 in if x = 1 then 
-          let () = print_string [cyan]
+          let () = print_string 
               "I will open door A\nBehind door A is a Goat" in 
           {choice = d; doors = perm; item = fst_item; switched = "A"}
         else 
-          let () = print_string [cyan] 
+          let () = print_string 
               "\nI will open door B\nBehind door B is a Goat" 
           in {choice = d; doors = perm; item = fst_item; switched = "B"}
       end
@@ -151,35 +150,34 @@ and play1 ch =
   ) 
   with 
   |Error s -> 
-    print_string [cyan] "An error has occured... please start over"; play1 ch
+    print_string  "An error has occured... please start over"; play1 ch
 
 
 (** [play2 st] completes the game by giving the option  to switch doors to the 
     user and handling it accordingly and printing the item 
     behind the user's final door choice *)
 and  play2 state = 
-  let () = print_string [cyan] "\nWould you like to switch doors? Yes or No" in 
-  set_autoreset true;
-  print_string [cyan] "\n>";
+  let () = print_string "\nWould you like to switch doors? Yes or No" in 
+  print_string  "\n>";
   let choice = String.trim (String.lowercase_ascii (read_line())) in 
   if choice = "no" then end_game state
   else if choice = "yes" then let state' = switch_doors state  in 
     end_game state'
-  else let () = print_string [cyan] "Not a valid command. Please try again" 
+  else let () = print_string "Not a valid command. Please try again" 
     in play2 state
 
 
 (** [end_game st] prints out the result behind the final door choice
     in [ch] *)
 and end_game st = 
-  let () = print_string [cyan] ("You have chosen door " ^ st.choice ^"") in 
+  let () = print_string  ("You have chosen door " ^ st.choice ^"") in 
   if ((st.item) = Car) then begin
-    print_string [cyan] ("\nBehind door " ^ st.choice ^" is a Car!! 
+    print_string ("\nBehind door " ^ st.choice ^" is a Car!! 
     You have won. Congratulations!
      For an explanation of the probability behind this game,
     please type \"monty hall explanation\"\n"); end
   else let winning_door = find_car (st.doors) in 
-    let () = print_string [cyan]
+    let () = print_string
         ("\nBehind door " ^ st.choice ^ " is a Goat. The car was behind door " 
          ^winning_door ^ ". You have lost, better luck next time!
          For an explanation of the probability behind this game, please type 
@@ -209,10 +207,9 @@ and start () =
   let st = Random.State.make_self_init() in 
   Random.set_state st;
   let () = Random.self_init() in
-  print_string [cyan]
+  print_string 
     "Welcome to the game. There are 3 doors, A, B, C. Please choose one";
-  print_string [cyan] "\n>";
+  print_string "\n>";
   let choice = String.trim (String.uppercase_ascii (read_line())) in
   let v = play1 choice in 
-  let ()  = play2 v  in 
-  set_autoreset true;
+  let ()  = play2 v in () 
