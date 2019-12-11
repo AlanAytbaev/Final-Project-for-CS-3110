@@ -1,19 +1,13 @@
 open Ast
 
 module type CFU_sig =  sig
-
   val operation_list : (string * ( value list -> value )) list
-
 end
 
 module type Fib_Funcs = sig
-
   val nth : value list -> value
-
   val lst : value list -> value
-
   val nfib_list : value list -> value
-
 end
 
 
@@ -34,7 +28,7 @@ module Fib_Functions : Fib_Funcs  = struct
       |h :: t -> h +. sum (n-.1.) t
 
   (** [nacci_help n k lst] is the first [k] 
-      elements of the [n]-step fibonacci sequence*)
+      elements of the [n]-step fibonacci sequence *)
   let rec nacci_help n k lst = 
     if k = 0. then List.rev lst 
     else
@@ -87,11 +81,9 @@ end
 
 
 module Fib_CFU : CFU_sig = struct
-
   let operation_list = [
     ("nth", Fib_Functions.nth);
     ("fib", Fib_Functions.lst);
     ("nfib", Fib_Functions.nfib_list);
   ]
-
 end

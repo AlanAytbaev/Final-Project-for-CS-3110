@@ -1,4 +1,4 @@
-MODULES=lexer parser arithmetic main statistics matrix trigonometric myset fibonacci newset
+MODULES=lexer parser arithmetic main statistics matrix trigonometric myset fibonacci
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)

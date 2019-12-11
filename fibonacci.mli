@@ -24,6 +24,11 @@ module type Fib_Funcs = sig
 
 end
 
+(** [Fib_Functions] is a module that implements the function values defined in
+    module type [Fib_Funcs]. This contains all the fibonacci functionalities 
+    of CAMLCALC *)
 module Fib_Functions : Fib_Funcs
 
+(** [Fib_CFU] is a module of type [CFU_sig] that contains the [operation_list] 
+    that maps operation symbols to fibonacci functions *)
 module Fib_CFU : CFU_sig
