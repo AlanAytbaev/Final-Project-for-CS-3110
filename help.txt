@@ -6,7 +6,8 @@ Functions that can be preformed:
 - User-defined functions (let <function name> = fun ( <argument list> ) -> <function body>)
 - Function application (<function name> <appropiate number of arguments>)
 - If then else statements 
-- Let definitions (let <variable name> = <value> )
+- Let definitions (let <variable name> = <value> ) NOTE: no numbers can be used 
+  in variable names
 - Let expressions (let <variable name> = <value> in <expression body>)
 - Statistics functions: type "statistics help" for more help 
 - Set functions: type "sets help" for more help 

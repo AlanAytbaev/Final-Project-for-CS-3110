@@ -25,7 +25,7 @@ calc:
 	$(OCAMLBUILD) calc.byte && ./calc.byte
 
 zip:
-	zip calculator.zip *.ml* _tags Makefile INSTALL.txt README.txt
+	zip calculator.zip *
 
 docs: docs-public docs-private
 

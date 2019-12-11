@@ -404,7 +404,14 @@ module Main = struct
         print_endline "Not a valid command please try again"; main () curr_env
 
 
-  (**[graph] *)
+  (** [graph c left_bound right_bound env] is the boolean true, and graphs the
+      value [c] on the x,y plane, from [left_bound] to [right_bound], in
+      the environment [env]. 
+      Graphing applies the closure [c] for each element in
+      a set of data points between [left_bound] and [right_bound] with a set
+      precision.
+      Requires: [c] is a VClosure that contains a function mapping a single 
+      float input [x] to a float output. *)
   let graph (c, left_bound, right_bound, env) =
     let (ids, f, env') =
       match c with
