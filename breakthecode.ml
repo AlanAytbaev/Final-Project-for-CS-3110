@@ -1,6 +1,5 @@
 
 open Stdlib
-open ANSITerminal
 open Printf
 
 
@@ -57,8 +56,9 @@ let rec hint_printer guess perm guessnumber =
       else "-" in 
     print_endline (s1^s2^s3^s4^s5); ()
   ) with 
-  |Failure f -> print_string [cyan] "Invalid guess, please try again";
-    print_string [cyan] "\n>";
+  |Failure f ->
+    print_string "Invalid guess, please try again";
+    print_string "\n>";
     let guess = String.trim (String.uppercase_ascii (read_line())) in
     game_play guess perm guessnumber
 
@@ -72,14 +72,14 @@ and game_play guess perm guessnumber =
     |i -> let bool = my_compare guess perm in 
       if bool then print_endline "Congratulations, You have won!! " 
       else let () = hint_printer guess perm guessnumber in 
-        print_string [cyan] "\n>";
+        print_string "\n>";
         let guess' = String.trim (String.uppercase_ascii (read_line())) in 
         game_play guess' perm (guessnumber + 1)
   )
   with 
   |Error s -> 
-    print_string [cyan] "Invalid guess, please try again";
-    print_string [cyan] "\n>";
+    print_string "Invalid guess, please try again";
+    print_string  "\n>";
     let guess = String.trim (String.uppercase_ascii (read_line())) in
     game_play guess perm guessnumber
 
@@ -95,7 +95,7 @@ Hints will be printed out after each guess in the form of:
 * -> a correct number in the wrong position
 Good Luck!" in 
   let () = print_endline "Guess #1 : " in 
-  print_string [cyan] "\n>";
+  print_string  "\n>";
   let guess = String.trim (String.uppercase_ascii (read_line())) in
   game_play guess perm 1
 

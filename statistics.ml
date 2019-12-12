@@ -1,14 +1,7 @@
 open Ast
 
-(** An abstract module type that is meant to structure the CFU modules (ie. Arit    metic functions, calculus functions, statistics functions). A module that ma    tches [CFU_sig] is suitable for use in the [Calc] module. *)
 module type CFU_sig = sig
-
-  (** An [operation_list] is an association list that maps operation symbo            ls to functions *)
   val operation_list : (string * ( value list -> value )) list
-
-  (** [find s] is the operation that is associated with [s] in the operation
-      list *)
-  val find_function : string -> (value list -> value)
 end
 
 module type Statistics_Funcs = sig
@@ -24,16 +17,19 @@ end
 
 module Statistics_Functions : Statistics_Funcs = struct
 
+  (** [unwrap_float v] is the float extracted from value [v] *)
   let unwrap_float (v : value) =
     match v with
     | VFloat x -> x
     | _ -> failwith "This cannot occur - matrix.ml"
 
+  (** [unwrap_row v] is the row extracted from value [v] *)
   let unwrap_row (v : value) : float array =
     match v with
     | VRow x -> x
     | _ -> failwith "This cannot occur - matrix.ml"
 
+  (** [mean_unwrap f] evaluates the mean of a float list [f] *)
   let mean_unwrap (f : float list) =
     (List.fold_left (fun acc x -> acc +. x) 0. f) /.
     (float_of_int(List.length f))
@@ -67,6 +63,8 @@ module Statistics_Functions : Statistics_Funcs = struct
               |> Float.sqrt)
     | _ -> failwith "InvalidInput"
 
+  (** [min_helper s min_acc] goes through [s] and finds the minimum value within
+      it  *)
   let rec min_helper (s : float list) min_acc=
     match s with
     | [] -> min_acc
@@ -78,6 +76,8 @@ module Statistics_Functions : Statistics_Funcs = struct
       VFloat (min_helper s max_float)
     | _ -> failwith "InvalidInput"
 
+  (** [max_helper s min_acc] goes through [s] and finds the maximum value within
+        it  *)
   let rec max_helper  (s : float list) max_acc=
     match s with
     | [] -> max_acc
@@ -95,6 +95,7 @@ module Statistics_Functions : Statistics_Funcs = struct
       VFloat ((unwrap_float (maximum v)) -. (unwrap_float (minimum v)))
     | _ -> failwith "InvalidInput"
 
+  (** [factorial n] calculates n! (n factorial) *)
   let rec factorial (n : float) =
     match n with
     | 0. -> 1.
@@ -136,9 +137,5 @@ module Statistics_CFU = struct
     ("perm", Statistics_Functions.permutations);
     ("comb", Statistics_Functions.combinations)
   ]
-  let find_function (identifier : string) =
-    match List.assoc_opt identifier operation_list with
-    |Some f -> f
-    |None -> failwith (identifier^" is not a valid imported function")
 
 end

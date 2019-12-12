@@ -1,13 +1,9 @@
 open Ast
 
-(** An abstract module type that is meant to structure the CFU modules (ie. Arit    metic functions, calculus functions, statistics functions). A module that ma    tches [CFU_sig] is suitable for use in the [Calc] module. *)
 module type CFU_sig = sig
   val operation_list : (string * ( value  list -> value )) list
-  val find_function : string -> (value list -> value)
 end
 
-(** A module that implements the functions needed for the trigonometric cfu. A module
-    that matches [Trigonometric_Funcs] is suitable for use in [Trigonometric_CFU]. *)
 module type Trigonometric_Funcs = sig
   val deg_to_rad : value list -> value
   val rad_to_deg : value list -> value
@@ -110,9 +106,5 @@ module Trigonometric_CFU : CFU_sig = struct
     ("cot", Trigonometric_Functions.cotan);
   ]
 
-  let find_function (identifier : string) =
-    match List.assoc_opt identifier operation_list with
-    |Some f -> f
-    |None -> failwith (identifier^" is not a valid imported function")
 
 end

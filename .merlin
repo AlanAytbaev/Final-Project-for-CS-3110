@@ -5,4 +5,3 @@ PKG unix
 PKG qcheck
 PKG ocamlbuild
 PKG bisect_ppx-ocamlbuild
-PKG ANSITerminal

@@ -1,11 +1,12 @@
-The Modular Calculator
+CAMLCALC
 ==============================
 By Emily, Nathan, Alan, and Saranya
 
 
 Installation Instructions:
 
-	If you have not done so already, unzip the zip file which contains this file using the appropriate tool.
+	If you have not done so already, unzip the zip file which contains this file
+	using the appropriate tool.
 
 	Enter the directory containing these unzipped files.
 
@@ -13,33 +14,26 @@ Installation Instructions:
 
 	Run the command [make build] to create the build files.
 
-	If you do not already have it, this part of our project requires you to install gnuplot to enable the graphing functionalities. 
+	If you do not already have it, this part of our project requires you to
+	install gnuplot to enable the graphing functionalities.
 
-	Important: if there exists file main.byte, remove it using [rm main.byte] before operating.
+	Important: if there exists file main.byte, remove it using [rm main.byte] 
+	before operating.
 
 Operating Instructions:
-	
-	Install the calculator using the installation instructions above before running.
+
+	Install the calculator using the installation instructions above 
+	before running.
 
 	Run [make calc] to execute the calculator.
 
-Calculator Operations: 
+	Type "help" within the CAMLCALC for instructions on the functionalities
+	of the calculator - Arithmetic, Fibonacci, Matrices, Sets, Statistics, 
+	Trigonometry, Graphing, Integrals, Derivatives, Monty Hall Game, Break the 
+	Code Game, Reading in Code Files
 
-        1) Arithmetic Operations Examples: a + b | a subt b | a * b | a / b | a % b 
 
-	2) Function Definition : let funname = fun ( x y ) -> x + y
+	**ADDITIONAL FUNCTIONALITIES THAT WERE NOT DEMOED ON 12/9:
+	Fibonacci, Matrix Determinants, Matrix Eigenvectors
 
-	3) Let Definition : let x = e where e is an expression 
 
-	4) Trigonometric functions : sin x | cos x | tan x | cot x | csc x | sec x where x is the angle in degrees only
-
-	5) Statistics functions : mean [lst] | median [lst] | max [lst] | min [lst] | 		stdev [lst] where [lst] is a list of numbers
-
-	permutations: perm n r | combinations: comb n r where n<r
-
-	6) Graphing : First define single variable function ; for instance let func = 	fun (x) -> x*x
-
-	Then type graph func . This should produce a .png which has the graph of the 		function in the working directory of the project. 
-
-Help:
-	Read this file again, but slowly.
